@@ -1,1 +1,7 @@
-﻿  Test.vcxproj -> G:\Visual Studio\Repos\GeometryDll\Geometry\x64\Debug\Test.exe
+﻿  Test.cpp
+G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(29,18): warning C4251: Bezier::points: class "std::vector<Point2D,std::allocator<Point2D>>" должен иметь dll-интерфейс для использования клиентами class "Bezier"
+G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Funcs.h(5): message : см. объявление "std::vector<Point2D,std::allocator<Point2D>>"
+G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(31,18): warning C4251: Bezier::basePoints: class "std::vector<Point2D,std::allocator<Point2D>>" должен иметь dll-интерфейс для использования клиентами class "Bezier"
+G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Funcs.h(5): message : см. объявление "std::vector<Point2D,std::allocator<Point2D>>"
+G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(52,1): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+  Test.vcxproj -> G:\Visual Studio\Repos\GeometryDll\Geometry\x64\Debug\Test.exe
