@@ -129,6 +129,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -151,8 +152,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Curves.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="Object2D.h" />
+    <ClInclude Include="Funcs.h" />
+    <ClInclude Include="Objects2D.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>

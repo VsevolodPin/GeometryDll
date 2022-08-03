@@ -1,4 +1,1 @@
-﻿  Test.cpp
-G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Object2D.h(101,18): warning C4251: Curve::points: class "std::vector<Point2D,std::allocator<Point2D>>" должен иметь dll-интерфейс для использования клиентами class "Curve"
-G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Object2D.h(101): message : см. объявление "std::vector<Point2D,std::allocator<Point2D>>"
-  Test.vcxproj -> G:\Visual Studio\Repos\GeometryDll\Geometry\x64\Debug\Test.exe
+﻿  Test.vcxproj -> G:\Visual Studio\Repos\GeometryDll\Geometry\x64\Debug\Test.exe

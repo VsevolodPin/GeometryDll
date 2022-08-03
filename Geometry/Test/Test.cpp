@@ -2,17 +2,23 @@
 //
 
 #include <iostream>
-#include "Object2D.h"
+#include "Objects2D.h"
+#include "Curves.h"
 
 int main()
 {
-	auto curve1 = Bezier(Point2D(5, 5), Point2D(1, 9), Point2D(15, 15), 100);
-	auto curve2 = Bezier(Point2D(1, 0), Point2D(10, 1), Point2D(11, 10), 100);
+	setlocale(LC_ALL, "Russian");
+
+	vector<Point2D> basePoints1 = vector<Point2D>{ Point2D(5, 5), Point2D(1, 9), Point2D(15, 15) };
+	vector<Point2D> basePoints2 = vector<Point2D>{ Point2D(1, 0), Point2D(10, 1), Point2D(11, 10) };
+
+	auto curve1 = Bezier(basePoints1, 100);
+	auto curve2 = Bezier(basePoints2, 100);
 	auto test = curve1.GetCurveCoords();
 
 	auto closestPoints = FindClosestPoints<Bezier, Bezier>(curve1, curve2, 1e-9);
 	std::cout.precision(9);
-	std::cout << "Min distance between curve1 and curve2 = " <<
+	std::cout << "Точки с наименьшим расстоянием между кривымы: " <<
 		closestPoints[0].e1 << " " <<
 		closestPoints[0].e2 << " " <<
 		closestPoints[1].e1 << " " <<
