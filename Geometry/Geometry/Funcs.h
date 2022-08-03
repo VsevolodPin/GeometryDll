@@ -55,7 +55,7 @@ template<typename CurveType1, typename CurveType2> DllExport vector<Point2D> Fin
 			if (idxP2 == 0) idxP2++;
 			if (idxP2 == curve2.accuracy - 1) idxP2--;
 			double tFromNew1 = tFrom1 + ((idxP1 - 1) / (double)(curve1.accuracy - 1)) * (tTo1 - tFrom1);
-			double tToNew1 = tFrom1+((idxP1 + 1) / (double)(curve1.accuracy - 1)) * (tTo1 - tFrom1);
+			double tToNew1 = tFrom1 + ((idxP1 + 1) / (double)(curve1.accuracy - 1)) * (tTo1 - tFrom1);
 			double tFromNew2 = tFrom2 + ((idxP2 - 1) / (double)(curve2.accuracy - 1)) * (tTo2 - tFrom2);
 			double tToNew2 = tFrom2 + ((idxP2 + 1) / (double)(curve2.accuracy - 1)) * (tTo2 - tFrom2);
 			tFrom1 = tFromNew1;
@@ -72,10 +72,10 @@ template<typename CurveType1, typename CurveType2> DllExport vector<Point2D> Fin
 
 // Функция определения факториала числа n
 int fact(int n)
-{  
+{
 	if (n <= 1) return 1;
 	int to_return = 1;
-	for (int i = n; i < 1; i--)
+	for (int i = n; i > 0; i--)
 	{
 		to_return *= i;
 	}
