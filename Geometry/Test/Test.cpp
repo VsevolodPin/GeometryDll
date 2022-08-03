@@ -9,8 +9,8 @@ int main()
 {
 	setlocale(LC_ALL, "Russian");
 
-	vector<Point2D> basePoints1 = vector<Point2D>{ Point2D(5, 5), Point2D(1, 9), Point2D(15, 15) };
-	vector<Point2D> basePoints2 = vector<Point2D>{ Point2D(1, 0), Point2D(10, 1), Point2D(11, 10) };
+	vector<Point2D> basePoints1 = vector<Point2D>{ Point2D(10, 10), Point2D(11, 11), Point2D(12, 13), Point2D(15, 15) };
+	vector<Point2D> basePoints2 = vector<Point2D>{ Point2D(1, 15), Point2D(7, 12), Point2D(13, 9) };
 
 	auto curve1 = Bezier(basePoints1, 100);
 	auto curve2 = Bezier(basePoints2, 100);
@@ -23,4 +23,9 @@ int main()
 		closestPoints[0].e2 << " " <<
 		closestPoints[1].e1 << " " <<
 		closestPoints[1].e2 << "\n";
+
+	auto crossPoint = FindCrossPoints<Bezier, Bezier>(curve1, curve2, 1e-9);
+	std::cout << "Точки с наименьшим расстоянием между кривымы: " <<
+		crossPoint[0].e1 << " " <<
+		crossPoint[0].e2 << "\n";
 }
