@@ -9,8 +9,8 @@ int main()
 {
 	setlocale(LC_ALL, "Russian");
 
-	vector<Point2D> basePoints1 = vector<Point2D>{ Point2D(10, 10), Point2D(11, 11), Point2D(12, 13), Point2D(15, 15) };
-	vector<Point2D> basePoints2 = vector<Point2D>{ Point2D(1, 15), Point2D(7, 12), Point2D(13, 9) };
+	vector<Point2D> basePoints1 = vector<Point2D>{  Point2D(3, 0),  Point2D(1, 3),  Point2D(5, 5),  Point2D(7, 3) };
+	vector<Point2D> basePoints2 = vector<Point2D>{  Point2D(2, 0),  Point2D(6, 3),  Point2D(10, 10) };
 
 	auto curve1 = Bezier(basePoints1, 100);
 	auto curve2 = Bezier(basePoints2, 100);
