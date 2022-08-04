@@ -14,7 +14,8 @@
 # Compiled Dynamic libraries
 *.so
 *.dylib
-*.dll
+Geometry.dll
+Geom.dll
 
 # Fortran module files
 *.mod

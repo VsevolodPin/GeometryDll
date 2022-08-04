@@ -27,12 +27,6 @@ public:
 		this->e1 = p1e1 - p2e1;
 		this->e2 = p1e2 - p2e2;
 	}
-	// Не понял, почему не работает :с
-	//Vector2D(Point2D p1, Point2D p2)
-	//{
-	//	this->e1 = p1.e1 - p2.e1;
-	//	this->e2 = p1.e2 - p2.e2;
-	//}
 
 	// Перегрузка основных операторов
 	Vector2D operator + (Vector2D v)
