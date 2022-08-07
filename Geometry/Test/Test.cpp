@@ -18,30 +18,33 @@ int main()
 	Curve* p1 = &curve1;
 	Curve* p2 = &curve2;
 
-	auto closestPoints = FindClosestPoints<Bezier, Bezier>(curve1, curve2, 1e-9);
-	std::cout.precision(9);
-	std::cout << "Точки с наименьшим расстоянием между кривыми, найденные через функцию с шаблоном:: " <<
-		closestPoints[0].e1 << " " <<
-		closestPoints[0].e2 << " " <<
-		closestPoints[1].e1 << " " <<
-		closestPoints[1].e2 << "\n";
+	vector<Point2D> crossPoint;
+	vector<Point2D> closestPoints;
+
+	//closestPoints = FindClosestPoints<Bezier, Bezier>(curve1, curve2, 1e-9);
+	//std::cout.precision(11);
+	//std::cout << "Точки с наименьшим расстоянием между кривыми, найденные через функцию с шаблоном:: " <<
+	//	closestPoints[0].e1 << " " <<
+	//	closestPoints[0].e2 << " " <<
+	//	closestPoints[1].e1 << " " <<
+	//	closestPoints[1].e2 << "\n";
 
 	closestPoints = FindClosestPoints(p1, p2, 1e-9);
 	std::cout.precision(9);
-	std::cout << "Точки с наименьшим расстоянием между кривыми, найденные через функцию без шаблона: " <<
+	std::cout << "Точки с наименьшим расстоянием между кривыми, найденные через функцию без шаблона:\n" <<
 		closestPoints[0].e1 << " " <<
 		closestPoints[0].e2 << " " <<
 		closestPoints[1].e1 << " " <<
 		closestPoints[1].e2 << "\n";
 
 
-	auto crossPoint = FindCrossPoints<Bezier, Bezier>(curve1, curve2, 1e-9);
-	for (int i = 0; i < crossPoint.size(); i++)
-	{
-		std::cout << "Точки с наименьшим расстоянием между кривыми, найденные через функцию с шаблоном: " <<
-			crossPoint[i].e1 << " " <<
-			crossPoint[i].e2 << "\n";
-	}
+	//crossPoint = FindCrossPoints<Bezier, Bezier>(curve1, curve2, 1e-9);
+	//for (int i = 0; i < crossPoint.size(); i++)
+	//{
+	//	std::cout << "Точки с наименьшим расстоянием между кривыми, найденные через функцию с шаблоном: " <<
+	//		crossPoint[i].e1 << " " <<
+	//		crossPoint[i].e2 << "\n";
+	//}
 
 	crossPoint = FindCrossPoints(p1, p2, 1e-9);
 	for (int i = 0; i < crossPoint.size(); i++)

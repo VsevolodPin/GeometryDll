@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <vector>
 #include "Objects2D.h"
 #include "Funcs.h"
@@ -172,7 +173,7 @@ DllExport vector<Point2D> FindClosestPoints(Curve* curve1, Curve* curve2, double
 	return to_return;
 }
 
-// ‘ункци€ поиска наименьшего рассто€ни€ между массивами точек, представл€ющих собой 2 различные кривые
+// ‘ункци€ поиска точки пересечени€ между массивами точек, представл€ющих собой 2 различные кривые
 DllExport vector<Point2D> FindCrossPoints(Curve* curve1, Curve* curve2, double eps = 1e-9)
 {
 	// Ќачальна€ инициализаци€
@@ -181,6 +182,7 @@ DllExport vector<Point2D> FindCrossPoints(Curve* curve1, Curve* curve2, double e
 	auto p2 = curve2->GetCurvePoints();
 	int accuracy1 = curve1->accuracy;
 	int accuracy2 = curve2->accuracy;
+	std::cout.precision(11);
 
 	// ƒвойной цикл поиск точек пересечени€
 	for (int i = 0; i < accuracy1 - 1; i++)
@@ -207,6 +209,7 @@ DllExport vector<Point2D> FindCrossPoints(Curve* curve1, Curve* curve2, double e
 				int idxP1 = i;
 				int idxP2 = j;
 				double curEps = 1;
+				double curEps1 = 1, curEps2 = 1;
 				double tFrom1 = 0, tFrom2 = 0;
 				double tTo1 = 1, tTo2 = 1;
 				Point2D prevCrossPoint = Point2D(e1, e2);
@@ -251,7 +254,12 @@ DllExport vector<Point2D> FindCrossPoints(Curve* curve1, Curve* curve2, double e
 								idxP1 = ii;
 								idxP2 = jj;
 								crossPoint = Point2D(e1, e2);
-								curEps = Vector2D(prevCrossPoint.e1, prevCrossPoint.e2, crossPoint.e1, crossPoint.e2).GetLength();
+								curEps1 = Vector2D(p1[idxP1].e1, p1[idxP1].e2, crossPoint.e1, crossPoint.e2).GetLength();
+								curEps2 = Vector2D(p2[idxP2].e1, p2[idxP2].e2, crossPoint.e1, crossPoint.e2).GetLength();
+								curEps = curEps1;
+								if (curEps1 > curEps2)
+									curEps = curEps2;
+								//curEps = Vector2D(prevCrossPoint.e1, prevCrossPoint.e2, crossPoint.e1, crossPoint.e2).GetLength();
 								// ¬ыход из двойного цикла (лучше так, читаемость из-за goto в данном случае не страдает)
 								goto cicleEnd;
 							}
@@ -264,11 +272,144 @@ DllExport vector<Point2D> FindCrossPoints(Curve* curve1, Curve* curve2, double e
 				p1 = curve1->GetCurvePoints();
 				p2 = curve2->GetCurvePoints();
 				to_return.push_back(crossPoint);
+				auto realPoint1 = curve1->MainFunc(tFrom1 + idxP1 * (tTo1 - tFrom1) / accuracy1);
+				auto realPoint2 = curve2->MainFunc(tFrom2 + idxP2 * (tTo2 - tFrom2) / accuracy2);
+				std::cout << "“очка пересечени€, точно соответствующа€ уравнению кривой 1: " << realPoint1.e1 << " " << realPoint1.e2 << "\n";
+				std::cout << "“очка пересечени€, точно соответствующа€ уравнению кривой 2: " << realPoint2.e1 << " " << realPoint2.e2 << "\n";
 			}
 		}
 	}
 	//  онец перебора всех точек
 	return to_return;
 }
+
+// ‘ункци€ поиска точки пересечени€ между массивами точек, представл€ющих собой 2 различные кривые
+DllExport vector<Point2D> FindCrossPointsViaEquations(Curve* curve1, Curve* curve2, double eps = 1e-9)
+{
+	// Ќачальна€ инициализаци€
+	vector<Point2D> to_return;
+	auto p1 = curve1->GetCurvePoints();
+	auto p2 = curve2->GetCurvePoints();
+	int accuracy1 = curve1->accuracy;
+	int accuracy2 = curve2->accuracy;
+
+	// ƒвойной цикл поиск точек пересечени€
+	for (int i = 0; i < accuracy1 - 1; i++)
+	{
+		Vector2D v1 = Vector2D(p1[i].e1, p1[i].e2, p1[i + 1].e1, p1[i + 1].e2);
+		double a1 = 1.0 / v1.e1, b1 = -1.0 / v1.e2, c1 = p1[i].e1 / v1.e1 - p1[i].e2 / v1.e2;
+		for (int j = 0; j < accuracy2 - 1; j++)
+		{
+			Vector2D v2 = Vector2D(p2[j].e1, p2[j].e2, p2[j + 1].e1, p2[j + 1].e2);
+			double a2 = 1.0 / v2.e1, b2 = -1.0 / v2.e2, c2 = p2[j].e1 / v2.e1 - p2[j].e2 / v2.e2;
+			// –ешение системы 2х2 на поиск точки пересечени€ двух векторов
+			double det = a1 * b2 - a2 * b1;
+			double root1 = c1 * b2 - c2 * b1;
+			double root2 = a1 * c2 - a2 * c1;
+			double e1 = root1 / det;
+			double e2 = root2 / det;
+			// ”словие искомой точки пересечени€ 
+			if (((e1 > p1[i].e1 && e1 < p1[i + 1].e1) ||
+				(e1 < p1[i].e1 && e1 > p1[i + 1].e1)) &&
+				((e1 > p2[j].e1 && e1 < p2[j + 1].e1) ||
+					(e1 < p2[j].e1 && e1 > p2[j + 1].e1)))
+			{
+				// Ќачальна€ инициализаци€ дл€ алгоритма увеличени€ точности точек пересечени€
+				int idxP1 = i;
+				int idxP2 = j;
+				double curEps = 1;
+				double tFrom1 = 0, tFrom2 = 0;
+				double tTo1 = 1, tTo2 = 1;
+				Point2D prevCrossPoint = Point2D(e1, e2);
+				Point2D crossPoint;
+
+				// ”точнение точности поиска точек пересечени€
+				do
+				{
+					double tFromNew1 = tFrom1 + ((idxP1) / (double)(accuracy1 - 1)) * (tTo1 - tFrom1);
+					double tToNew1 = tFrom1 + ((idxP1 + 1) / (double)(accuracy1 - 1)) * (tTo1 - tFrom1);
+					double tFromNew2 = tFrom2 + ((idxP2) / (double)(accuracy2 - 1)) * (tTo2 - tFrom2);
+					double tToNew2 = tFrom2 + ((idxP2 + 1) / (double)(accuracy2 - 1)) * (tTo2 - tFrom2);
+					tFrom1 = tFromNew1;
+					tTo1 = tToNew1;
+					tFrom2 = tFromNew2;
+					tTo2 = tToNew2;
+					p1 = curve1->ImproveAccuracy(tFromNew1, tToNew1, accuracy1);
+					p2 = curve2->ImproveAccuracy(tFromNew2, tToNew2, accuracy2);
+					double pr1x, pr1y, pr2x, pr2y;
+
+					for (int ii = 0; ii < accuracy1; ii++)
+					{
+						for (int jj = 0; jj < accuracy2 - 1; jj++)
+						{
+							double dt1 = (tTo1 - tFrom1) / accuracy1;
+							double dt2 = (tTo2 - tFrom2) / accuracy2;
+							v1 = Vector2D(
+								curve1->MainFunc(tFrom1 + ii * dt1).e1, curve1->MainFunc(tFrom1 + ii * dt1).e2,
+								curve2->MainFunc(tFrom2 + jj * dt2).e1, curve2->MainFunc(tFrom2 + jj * dt2).e2);
+							v2 = Vector2D(
+								curve1->MainFunc(tFrom1 + ii * dt1).e1, curve1->MainFunc(tFrom1 + ii * dt1).e2,
+								curve2->MainFunc(tFrom2 + (jj + 1) * dt2).e1, curve2->MainFunc(tFrom2 + (jj + 1) * dt2).e2);
+						}
+					}
+					//double length =
+
+
+						//	// ”величение точности кривых
+						//	double tFromNew1 = tFrom1 + ((idxP1) / (double)(accuracy1 - 1)) * (tTo1 - tFrom1);
+						//	double tToNew1 = tFrom1 + ((idxP1 + 1) / (double)(accuracy1 - 1)) * (tTo1 - tFrom1);
+						//	double tFromNew2 = tFrom2 + ((idxP2) / (double)(accuracy2 - 1)) * (tTo2 - tFrom2);
+						//	double tToNew2 = tFrom2 + ((idxP2 + 1) / (double)(accuracy2 - 1)) * (tTo2 - tFrom2);
+						//	tFrom1 = tFromNew1;
+						//	tTo1 = tToNew1;
+						//	tFrom2 = tFromNew2;
+						//	tTo2 = tToNew2;
+						//	p1 = curve1->ImproveAccuracy(tFromNew1, tToNew1, accuracy1);
+						//	p2 = curve2->ImproveAccuracy(tFromNew2, tToNew2, accuracy2);
+
+						//	// ƒвойной цикл поиска уточненной точки пересечени€
+						//	for (int ii = 0; ii < accuracy1 - 1; ii++)
+						//	{
+						//		v1 = Vector2D(p1[ii].e1, p1[ii].e2, p1[ii + 1].e1, p1[ii + 1].e2);
+						//		a1 = 1.0 / v1.e1, b1 = -1.0 / v1.e2, c1 = p1[ii].e1 / v1.e1 - p1[ii].e2 / v1.e2;
+						//		for (int jj = 0; jj < accuracy2 - 1; jj++)
+						//		{
+						//			v2 = Vector2D(p2[jj].e1, p2[jj].e2, p2[jj + 1].e1, p2[jj + 1].e2);
+						//			a2 = 1.0 / v2.e1, b2 = -1.0 / v2.e2, c2 = p2[jj].e1 / v2.e1 - p2[jj].e2 / v2.e2;
+						//			// –ешение системы 2х2 на поиск уточненной точки пересечени€ двух векторов
+						//			det = a1 * b2 - a2 * b1;
+						//			root1 = c1 * b2 - c2 * b1;
+						//			root2 = a1 * c2 - a2 * c1;
+						//			e1 = root1 / det;
+						//			e2 = root2 / det;
+						//			// ”словие искомой уточненной точки пересечени€ 
+						//			if (((e1 > p1[ii].e1 && e1 < p1[ii + 1].e1) ||
+						//				(e1 < p1[ii].e1 && e1 > p1[ii + 1].e1)) &&
+						//				((e1 > p2[jj].e1 && e1 < p2[jj + 1].e1) ||
+						//					(e1 < p2[jj].e1 && e1 > p2[jj + 1].e1)))
+						//			{
+						//				idxP1 = ii;
+						//				idxP2 = jj;
+						//				crossPoint = Point2D(e1, e2);
+						//				curEps = Vector2D(prevCrossPoint.e1, prevCrossPoint.e2, crossPoint.e1, crossPoint.e2).GetLength();
+						//				// ¬ыход из двойного цикла (лучше так, читаемость из-за goto в данном случае не страдает)
+						//				goto cicleEnd;
+						//			}
+						//		}
+						//	}
+						//	// “очка выхода из двойного цикла поиска уточненной точки пересечени€
+						//cicleEnd:
+						//	prevCrossPoint = crossPoint;
+				} while (curEps > eps);
+				p1 = curve1->GetCurvePoints();
+				p2 = curve2->GetCurvePoints();
+				to_return.push_back(crossPoint);
+			}
+		}
+	}
+	//  онец перебора всех точек
+	return to_return;
+}
+
 
 
