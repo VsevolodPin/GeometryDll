@@ -49,8 +49,11 @@ int main()
 	crossPoint = FindCrossPoints(p1, p2, 1e-9);
 	for (int i = 0; i < crossPoint.size(); i++)
 	{
-		std::cout << "Точки с наименьшим расстоянием между кривыми, найденная через функцию без шаблона: " <<
+		std::cout << "Точка пересечения кривых #" << i + 1 << ", найденная через функцию без шаблона : " <<
 			crossPoint[i].e1 << " " <<
 			crossPoint[i].e2 << "\n";
 	}
+
+	char res;
+	std::cin >> res;
 }

@@ -182,7 +182,7 @@ DllExport vector<Point2D> FindCrossPoints(Curve* curve1, Curve* curve2, double e
 	auto p2 = curve2->GetCurvePoints();
 	int accuracy1 = curve1->accuracy;
 	int accuracy2 = curve2->accuracy;
-	std::cout.precision(11);
+	std::cout.precision(12);
 
 	// ƒвойной цикл поиск точек пересечени€
 	for (int i = 0; i < accuracy1 - 1; i++)
@@ -257,7 +257,7 @@ DllExport vector<Point2D> FindCrossPoints(Curve* curve1, Curve* curve2, double e
 								curEps1 = Vector2D(p1[idxP1].e1, p1[idxP1].e2, crossPoint.e1, crossPoint.e2).GetLength();
 								curEps2 = Vector2D(p2[idxP2].e1, p2[idxP2].e2, crossPoint.e1, crossPoint.e2).GetLength();
 								curEps = curEps1;
-								if (curEps1 > curEps2)
+								if (curEps1 < curEps2)
 									curEps = curEps2;
 								//curEps = Vector2D(prevCrossPoint.e1, prevCrossPoint.e2, crossPoint.e1, crossPoint.e2).GetLength();
 								// ¬ыход из двойного цикла (лучше так, читаемость из-за goto в данном случае не страдает)
@@ -274,8 +274,10 @@ DllExport vector<Point2D> FindCrossPoints(Curve* curve1, Curve* curve2, double e
 				to_return.push_back(crossPoint);
 				auto realPoint1 = curve1->MainFunc(tFrom1 + idxP1 * (tTo1 - tFrom1) / accuracy1);
 				auto realPoint2 = curve2->MainFunc(tFrom2 + idxP2 * (tTo2 - tFrom2) / accuracy2);
-				std::cout << "“очка пересечени€, точно соответствующа€ уравнению кривой 1: " << realPoint1.e1 << " " << realPoint1.e2 << "\n";
-				std::cout << "“очка пересечени€, точно соответствующа€ уравнению кривой 2: " << realPoint2.e1 << " " << realPoint2.e2 << "\n";
+				std::cout << std::endl;
+				std::cout << "“очка пересечени€ #" << to_return.size() << ", точно соответствующа€ уравнению кривой 1:  " << realPoint1.e1 << " " << realPoint1.e2 << "\n";
+				std::cout << "“очка пересечени€ #" << to_return.size() << ", точно соответствующа€ уравнению кривой 2:  " << realPoint2.e1 << " " << realPoint2.e2 << "\n";
+				std::cout << "“очка пересечени€ #" << to_return.size() << ", найденна€ в результате численного решени€: " << crossPoint.e1 << " " << crossPoint.e2 << "\n\n";
 			}
 		}
 	}
