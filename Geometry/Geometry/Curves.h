@@ -176,6 +176,8 @@ DllExport vector<Point2D> FindClosestPoints(Curve* curve1, Curve* curve2, double
 // Функция поиска точки пересечения между массивами точек, представляющих собой 2 различные кривые
 DllExport vector<Point2D> FindCrossPoints(Curve* curve1, Curve* curve2, double eps = 1e-9)
 {
+	std::cout << "\nРезультаты поиска корней через отрезки кривых:\n";
+	
 	// Начальная инициализация
 	vector<Point2D> to_return;
 	auto p1 = curve1->GetCurvePoints();
@@ -284,6 +286,108 @@ DllExport vector<Point2D> FindCrossPoints(Curve* curve1, Curve* curve2, double e
 	// Конец перебора всех точек
 	return to_return;
 }
+
+// Функция поиска точки пересечения между массивами точек, представляющих собой 2 различные кривые
+DllExport vector<Point2D> FindCrossPointsViaEquations(Curve* curve1, Curve* curve2, double eps = 1e-9)
+{
+	std::cout << "\nРезультаты поиска корней через уравнения кривых:\n";
+	// Начальная инициализация
+	vector<Point2D> to_return;
+	int accuracy1 = curve1->accuracy;
+	int accuracy2 = curve2->accuracy;
+	double dt1 = 1.0 / accuracy1;
+	double dt2 = 1.0 / accuracy2;
+	Point2D p1, p2;
+	int idxFrom1, idxTo1, idxFrom2, idxTo2;
+	double curEps, newCurEps;
+	double tFrom1, tTo1, tFrom2, tTo2;
+	tFrom1 = 0;
+	tTo1 = 1;
+	tFrom2 = 0;
+	tTo2 = 1;
+
+	for (int i = 0; i < accuracy1; i++)
+	{
+		p1 = curve1->MainFunc(i * dt1);
+		for (int j = 0; j < accuracy2; j++)
+		{
+			p2 = curve2->MainFunc(j * dt2);
+			curEps = Vector2D(p1.e1, p1.e2, p2.e1, p2.e2).GetLength();
+
+			if (curEps < 1e-1)
+			{
+				idxFrom1 = i - 1;
+				idxFrom2 = j - 1;
+				idxTo1 = idxFrom1 + 9;
+				idxTo2 = idxFrom2 + 9;
+				i = idxTo1;
+				j = idxTo2;
+				do
+				{
+					double tFrom1new, tTo1new, tFrom2new, tTo2new;
+					tFrom1new = tFrom1 + idxFrom1 * dt1;
+					tTo1new = tFrom1 + idxTo1 * dt1;
+					tFrom2new = tFrom2 + idxFrom2 * dt2;
+					tTo2new = tFrom2 + idxTo2 * dt2;
+
+					tFrom1 = tFrom1new;
+					tTo1 = tTo1new;
+					tFrom2 = tFrom2new;
+					tTo2 = tTo2new;
+
+					dt1 = (tTo1 - tFrom1) / accuracy1;
+					dt2 = (tTo2 - tFrom2) / accuracy2;
+
+					p1 = curve1->MainFunc(tFrom1);
+					p2 = curve2->MainFunc(tFrom2);
+					curEps = Vector2D(p1.e1, p1.e2, p2.e1, p2.e2).GetLength();
+
+					if (dt1 == 0 || dt2 == 0)
+						break;
+
+					for (int ii = 0; ii < accuracy1; ii++)
+					{
+						p1 = curve1->MainFunc(tFrom1 + ii * dt1);
+						for (int jj = 0; jj < accuracy2; jj++)
+						{
+							if (ii == 0 && jj == 0) continue;
+							p2 = curve2->MainFunc(tFrom2 + jj * dt2);
+							newCurEps = Vector2D(p1.e1, p1.e2, p2.e1, p2.e2).GetLength();
+							if (newCurEps < curEps)
+							{
+								curEps = newCurEps;
+								idxFrom1 = ii;
+								idxFrom2 = jj;
+							}
+						}
+					}
+					idxFrom1 -= 1;
+					idxFrom2 -= 1;
+					idxTo1 = idxFrom1 + 9;
+					idxTo2 = idxFrom2 + 9;
+				} while (curEps > eps);
+				to_return.push_back((p1 + p2) / 2);
+				auto P1 = curve1->MainFunc(tFrom1 + dt1 * (idxFrom1 + 1));
+				auto P2 = curve2->MainFunc(tFrom2 + dt2 * (idxFrom2 + 1));
+				std::cout.precision(12);
+				std::cout << "\nТочка пересечения, соответствующая уравнению кривой #1: " << P1.e1 << " " << P1.e2 << "\n";
+				std::cout << "Точка пересечения, соответствующая уравнению кривой #2: " << P2.e1 << " " << P2.e2 << "\n";
+				std::cout.precision(8);
+				std::cout << "Погрешность в решении уравнения f1(t1) - f2(t2) = 0:    " << (P1 - P2).e1 << " " << (P1 - P2).e2 << "\n\n";
+				dt1 = 1.0 / accuracy1;
+				dt2 = 1.0 / accuracy2;
+				p1 = curve1->MainFunc(i * dt1);
+				p2 = curve2->MainFunc(j * dt2);
+				tFrom1 = 0;
+				tFrom2 = 0;
+			}
+		}
+	}
+
+	// Конец перебора всех точек
+	return to_return;
+}
+
 
 
 
