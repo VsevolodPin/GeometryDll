@@ -38,7 +38,7 @@ int main()
 	//		crossPoint[i].e2 << "\n";
 	//}
 
-	crossPoint = FindCrossPointsViaEquations(p1, p2, 1e-9);
+	crossPoint = FindCrossPointsViaEquations(p1, p2, 1e-9, 100);
 	//for (int i = 0; i < crossPoint.size(); i++)
 	//{
 	//	std::cout << "Точка пересечения кривых #" << i + 1 << ", найденная через функцию без шаблона : " <<

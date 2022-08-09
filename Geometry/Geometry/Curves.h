@@ -177,7 +177,7 @@ DllExport vector<Point2D> FindClosestPoints(Curve* curve1, Curve* curve2, double
 DllExport vector<Point2D> FindCrossPoints(Curve* curve1, Curve* curve2, double eps = 1e-9)
 {
 	std::cout << "\nРезультаты поиска корней через отрезки кривых:\n";
-	
+
 	// Начальная инициализация
 	vector<Point2D> to_return;
 	auto p1 = curve1->GetCurvePoints();
@@ -288,42 +288,47 @@ DllExport vector<Point2D> FindCrossPoints(Curve* curve1, Curve* curve2, double e
 }
 
 // Функция поиска точки пересечения между массивами точек, представляющих собой 2 различные кривые
-DllExport vector<Point2D> FindCrossPointsViaEquations(Curve* curve1, Curve* curve2, double eps = 1e-9)
+DllExport vector<Point2D> FindCrossPointsViaEquations(Curve* curve1, Curve* curve2, double eps = 1e-9, int accuracy = 100)
+
 {
 	std::cout << "\nРезультаты поиска корней через уравнения кривых:\n";
 	// Начальная инициализация
 	vector<Point2D> to_return;
-	int accuracy1 = curve1->accuracy;
-	int accuracy2 = curve2->accuracy;
-	double dt1 = 1.0 / accuracy1;
-	double dt2 = 1.0 / accuracy2;
-	Point2D p1, p2;
-	int idxFrom1, idxTo1, idxFrom2, idxTo2;
+	Point2D p1, p2, realPoint1, realPoint2;
+	double dt1 = 1.0 / accuracy;
+	double dt2 = 1.0 / accuracy;
 	double curEps, newCurEps;
-	double tFrom1, tTo1, tFrom2, tTo2;
-	tFrom1 = 0;
-	tTo1 = 1;
-	tFrom2 = 0;
-	tTo2 = 1;
-
-	for (int i = 0; i < accuracy1; i++)
+	double
+		tFrom1 = 0,
+		tTo1 = 1,
+		tFrom2 = 0,
+		tTo2 = 1;
+	int idxFrom1, idxTo1, idxFrom2, idxTo2;
+	// Двойной цикл перебора всех возможных корней
+	for (int i = 0; i < accuracy; i++)
 	{
 		p1 = curve1->MainFunc(i * dt1);
-		for (int j = 0; j < accuracy2; j++)
+		for (int j = 0; j < accuracy; j++)
 		{
+			if (i == 0 && j == 0) continue;
 			p2 = curve2->MainFunc(j * dt2);
 			curEps = Vector2D(p1.e1, p1.e2, p2.e1, p2.e2).GetLength();
-
+			// Условие существования корня на промежутке (число 1е-1 взято наобум, но работает)
+			// Теоретически из-за этого могут существовать ложные корни, но пока непонятно как решить эту проблему
 			if (curEps < 1e-1)
 			{
+				// Локализуем корень
 				idxFrom1 = i - 1;
 				idxFrom2 = j - 1;
 				idxTo1 = idxFrom1 + 9;
 				idxTo2 = idxFrom2 + 9;
+				// Скипаем индексы, чтобы не было повторного попадания в локализованный участок
 				i = idxTo1;
 				j = idxTo2;
+				// Цикл уточнения значения корня
 				do
 				{
+					// Переинициализация пределов t1, t2 поиска корня
 					double tFrom1new, tTo1new, tFrom2new, tTo2new;
 					tFrom1new = tFrom1 + idxFrom1 * dt1;
 					tTo1new = tFrom1 + idxTo1 * dt1;
@@ -335,20 +340,24 @@ DllExport vector<Point2D> FindCrossPointsViaEquations(Curve* curve1, Curve* curv
 					tFrom2 = tFrom2new;
 					tTo2 = tTo2new;
 
-					dt1 = (tTo1 - tFrom1) / accuracy1;
-					dt2 = (tTo2 - tFrom2) / accuracy2;
+					dt1 = (tTo1 - tFrom1) / accuracy;
+					dt2 = (tTo2 - tFrom2) / accuracy;
 
+					// Ошиблись с корнем, бывает
+					if (dt1 == 0 || dt2 == 0)
+					{
+						goto wrongRootCase;
+					}
+
+
+					// Двойной цикл поиска ближайшего к реальному корню значения
 					p1 = curve1->MainFunc(tFrom1);
 					p2 = curve2->MainFunc(tFrom2);
 					curEps = Vector2D(p1.e1, p1.e2, p2.e1, p2.e2).GetLength();
-
-					if (dt1 == 0 || dt2 == 0)
-						break;
-
-					for (int ii = 0; ii < accuracy1; ii++)
+					for (int ii = 0; ii < accuracy; ii++)
 					{
 						p1 = curve1->MainFunc(tFrom1 + ii * dt1);
-						for (int jj = 0; jj < accuracy2; jj++)
+						for (int jj = 0; jj < accuracy; jj++)
 						{
 							if (ii == 0 && jj == 0) continue;
 							p2 = curve2->MainFunc(tFrom2 + jj * dt2);
@@ -366,28 +375,35 @@ DllExport vector<Point2D> FindCrossPointsViaEquations(Curve* curve1, Curve* curv
 					idxTo1 = idxFrom1 + 9;
 					idxTo2 = idxFrom2 + 9;
 				} while (curEps > eps);
+				// Вносим найденный корень в массив корней
 				to_return.push_back((p1 + p2) / 2);
-				auto P1 = curve1->MainFunc(tFrom1 + dt1 * (idxFrom1 + 1));
-				auto P2 = curve2->MainFunc(tFrom2 + dt2 * (idxFrom2 + 1));
+
+				// Отладкочная информация
+				realPoint1 = curve1->MainFunc(tFrom1 + dt1 * (idxFrom1 + 1));
+				realPoint2 = curve2->MainFunc(tFrom2 + dt2 * (idxFrom2 + 1));
 				std::cout.precision(12);
-				std::cout << "\nТочка пересечения, соответствующая уравнению кривой #1: " << P1.e1 << " " << P1.e2 << "\n";
-				std::cout << "Точка пересечения, соответствующая уравнению кривой #2: " << P2.e1 << " " << P2.e2 << "\n";
+				std::cout << "\nТочка пересечения, соответствующая уравнению кривой #1: " << realPoint1.e1 << " " << realPoint1.e2 << "\n";
+				std::cout << "Точка пересечения, соответствующая уравнению кривой #2: " << realPoint2.e1 << " " << realPoint2.e2 << "\n";
 				std::cout.precision(8);
-				std::cout << "Погрешность в решении уравнения f1(t1) - f2(t2) = 0:    " << (P1 - P2).e1 << " " << (P1 - P2).e2 << "\n\n";
-				dt1 = 1.0 / accuracy1;
-				dt2 = 1.0 / accuracy2;
+				std::cout << "Погрешность в решении уравнения f1(t1) - f2(t2) = 0:    " << (realPoint1 - realPoint2).e1 << " " << (realPoint1 - realPoint2).e2 << "\n\n";
+				// Конец отладки
+
+			wrongRootCase:
+				// Возвращаем значения переменных для "грубого" поиска корней по кривой
+				dt1 = 1.0 / accuracy;
+				dt2 = 1.0 / accuracy;
 				p1 = curve1->MainFunc(i * dt1);
 				p2 = curve2->MainFunc(j * dt2);
 				tFrom1 = 0;
 				tFrom2 = 0;
+				tTo1 = 1;
+				tTo2 = 1;
 			}
 		}
 	}
-
-	// Конец перебора всех точек
+	// Конец поиска корней
 	return to_return;
 }
-
 
 
 
