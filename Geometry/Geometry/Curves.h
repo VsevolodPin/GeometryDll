@@ -114,7 +114,7 @@ DllExport vector<Point2D> FindClosestPoints(Curve* curve1, Curve* curve2, double
 		Vector2D v = Vector2D(p1[0].e1, p1[0].e2, p2[0].e1, p2[0].e2);
 		double min = v.GetLength();
 		// Двойной цикл перебора всех пар точек
-		for (int i = 0; i <accuracy; i++)
+		for (int i = 0; i < accuracy; i++)
 		{
 			for (int j = 0; j < accuracy; j++)
 			{
@@ -406,18 +406,18 @@ DllExport vector<Point2D> FindCrossPointsViaGradient(Curve* curve1, Curve* curve
 	std::cout << "\nРезультаты поиска корней через градиентный спуск:\n";
 	// Начальная инициализация
 	vector<Point2D> to_return;
+	Point2D realPoint1, realPoint2;
 	// Что-то вроде локализации корней - по-прежнему не совсем понятно, как это сделать
 	for (int i = 0; i < hypothesisCountOfPoints; i++)
 	{
-		double startT1 = 1.0 / (hypothesisCountOfPoints + 1) * (i + 1);
-		double startT2 = 1.0 / (hypothesisCountOfPoints + 1) * (i + 1);
-		double prevEps, curEps;
-		double t1 = startT1, t2 = startT2;
+		double t1 = 1.0 / (hypothesisCountOfPoints + 1) * (i + 1);
+		double t2 = 1.0 / (hypothesisCountOfPoints + 1) * (i + 1);
 		double dt = dt0;
 		double a = a0;
-		// Функция, которую будем минимизаровать - расстояние между точками кривых
-		auto metric = [](Point2D p1, Point2D p2)->double {return Vector2D(p1.e1, p1.e2, p2.e1, p2.e2).GetLength(); };
+		double prevEps, curEps;
 		double l1, l2;
+		// Функция, которая будет минимизароваться - расстояние между точками кривых
+		auto metric = [](Point2D p1, Point2D p2)->double {return Vector2D(p1.e1, p1.e2, p2.e1, p2.e2).GetLength(); };
 		curEps = metric(curve1->F(t1), curve2->F(t2));
 		// Градиентый спуск к корню
 		do
@@ -429,8 +429,15 @@ DllExport vector<Point2D> FindCrossPointsViaGradient(Curve* curve1, Curve* curve
 				metric(curve1->F(t1 + dt), curve2->F(t2)),
 				metric(curve1->F(t1), curve2->F(t2 + dt)),
 				dt, dt, a);
+
+			// Движение по антиградиенту
 			t1 -= grad[0];
 			t2 -= grad[1];
+
+			// Принудительный выход без включения корня в список корней
+			if (t1 < 0 || t2 < 0 || t1>1 || t2>1) 
+				goto iteration_end;
+
 			l2 = metric(curve1->F(t1), curve2->F(t2));
 			curEps = abs((l2 + l1) / 2);
 			double mod = curEps / prevEps;
@@ -440,14 +447,15 @@ DllExport vector<Point2D> FindCrossPointsViaGradient(Curve* curve1, Curve* curve
 		} while (curEps > eps);
 		to_return.push_back((curve1->F(t1) + curve2->F(t2)) / 2);
 		// Отладочная информация
-		auto realPoint1 = curve1->F(t1);
-		auto realPoint2 = curve2->F(t2);
+		realPoint1 = curve1->F(t1);
+		realPoint2 = curve2->F(t2);
 		std::cout.precision(10);
 		std::cout << "\nТочка пересечения, соответствующая уравнению кривой #1: " << realPoint1.e1 << " " << realPoint1.e2 << "\n";
 		std::cout << "Точка пересечения, соответствующая уравнению кривой #2: " << realPoint2.e1 << " " << realPoint2.e2 << "\n";
 		std::cout << "Погрешность f1(" << t1 << ") - f2(" << t2 << ") = 0:   ";
 		std::cout.precision(6);
 		std::cout << (realPoint1 - realPoint2).e1 << " " << (realPoint1 - realPoint2).e2 << "\n\n";
+	iteration_end:;
 	}
 	std::cout << "Количество итераций: " << count << "\n";
 	// Конец поиска корней

@@ -184,12 +184,8 @@ int fact(int n)
 	return to_return;
 }
 
-double grad(double ft, double fdt, double dt)
-{
-	return (fdt - dt) / dt;;
-}
-
-vector<double> gradient(double f, double fdt1, double fdt2, double dt1, double dt2, double a = 0.01)
+// Метод поиска градиента функции двух переменных
+vector<double> gradient(double f, double fdt1, double fdt2, double dt1, double dt2, double a)
 {
 	vector<double> to_return;
 	to_return.push_back((fdt1 - f) / dt1*a);

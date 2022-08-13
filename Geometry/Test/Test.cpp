@@ -29,22 +29,9 @@ int main()
 		closestPoints[1].e1 << " " <<
 		closestPoints[1].e2 << "\n";
 
-
 	crossPoint = FindCrossPointsViaSegments(p1, p2, 1e-9);
-	//for (int i = 0; i < crossPoint.size(); i++)
-	//{
-	//	std::cout << "Точка пересечения кривых #" << i + 1 << ", найденная через функцию без шаблона : " <<
-	//		crossPoint[i].e1 << " " <<
-	//		crossPoint[i].e2 << "\n";
-	//}
 
 	crossPoint = FindCrossPointsViaEquations(p1, p2, 1e-9, 100);
-	//for (int i = 0; i < crossPoint.size(); i++)
-	//{
-	//	std::cout << "Точка пересечения кривых #" << i + 1 << ", найденная через функцию без шаблона : " <<
-	//		crossPoint[i].e1 << " " <<
-	//		crossPoint[i].e2 << "\n";
-	//}
 
 	crossPoint = FindCrossPointsViaGradient(p1, p2, 1e-9, 2);
 
