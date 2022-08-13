@@ -10,43 +10,29 @@ using namespace std;
 class  DllExport Curve
 {
 public:
-	// Точность моделирования
-	int accuracy;
 	// Уравнение кривой в параметрическом виде (у каждого наследника будет свое уравнение)
-	virtual Point2D MainFunc(double  t) = 0;
+	virtual Point2D F(double  t) = 0;
 	// Получение массива точек (Point2D *) кривой
-	virtual vector<Point2D> GetCurvePoints() = 0;
+	virtual const vector<Point2D> GetCurvePoints(int N) = 0;
 	// Получение двумерного массива координат точек
-	virtual vector<vector<double>> GetCurveCoords() = 0;
+	virtual const vector<vector<double>> GetCurveCoords(int N) = 0;
 	// Метод увеличения точности моделирования кривой 
-	virtual vector<Point2D> ImproveAccuracy(double t1, double t2, int accuracy) = 0;
+	virtual const vector<Point2D> ImproveAccuracy(double t1, double t2, int accuracy) = 0;
 };
 
 // Класс, представляющий кривую Безье 2го порядка
 class  DllExport Bezier : public Curve
 {
-	// Массив точек
-	vector<Point2D> points;
 	// Опорные точки
 	vector<Point2D> basePoints;
 public:
 	// Три опорные точки и точность моделирования (по умолчанию 100)
-	Bezier(vector<Point2D> basePoints, int accuracy)
+	Bezier(vector<Point2D> basePoints)
 	{
 		this->basePoints = basePoints;
-		this->accuracy = accuracy;
-		points.resize(accuracy);
-		for (int i = 0; i < accuracy; i++)
-		{
-			points[i] = MainFunc(1.0 / (accuracy - 1) * i);
-		}
-	}
-	~Bezier()
-	{
-		points.clear();
 	}
 	// Уравнение кривой в параметрическом виде 
-	Point2D MainFunc(double  t) override
+	Point2D F(double  t) override
 	{
 		Point2D to_return = Point2D(0, 0);
 		int n = basePoints.size() - 1;
@@ -68,32 +54,37 @@ public:
 		return to_return;
 	}
 	// Получение массива точек (Point2D *) кривой
-	vector<Point2D> GetCurvePoints()override
+	const vector<Point2D> GetCurvePoints(int N)override
 	{
+		vector<Point2D> points;
+		points.resize(N);
+		for (int i = 0; i < N; i++)
+			points[i] = F(1.0 / (N - 1) * i);
 		return points;
 	}
 	// Получение двумерного массива координат точек
-	vector<vector<double>> GetCurveCoords()override
+	const vector<vector<double>> GetCurveCoords(int N)override
 	{
 		vector<vector<double>> coords;
 		coords.resize(2);
-		coords[0].resize(accuracy);
-		coords[1].resize(accuracy);
-		for (int i = 0; i < accuracy; i++)
+		coords[0].resize(N);
+		coords[1].resize(N);
+		for (int i = 0; i < N; i++)
 		{
-			coords[0][i] = points[i].e1;
-			coords[1][i] = points[i].e2;
+			auto p = this->F(1.0 / (N - 1) * i);
+			coords[0][i] = p.e1;
+			coords[1][i] = p.e2;
 		}
 		return coords;
 	}
 	// Метод увеличения точности моделирования кривой 
-	vector<Point2D> ImproveAccuracy(double t1, double t2, int accuracy)override
+	const vector<Point2D> ImproveAccuracy(double t1, double t2, int accuracy)override
 	{
 		vector<Point2D> to_return;
 		to_return.resize(accuracy);
 		for (int i = 0; i < accuracy; i++)
 		{
-			to_return[i] = MainFunc(t1 + (t2 - t1) / (accuracy - 1) * i);
+			to_return[i] = F(t1 + (t2 - t1) / (accuracy - 1) * i);
 		}
 		return to_return;
 	}
@@ -112,8 +103,9 @@ DllExport vector<Point2D> FindClosestPoints(Curve* curve1, Curve* curve2, double
 	int idxP2 = 0;
 	double tFrom1 = 0, tFrom2 = 0;
 	double tTo1 = 1, tTo2 = 1;
-	auto p1 = curve1->GetCurvePoints();
-	auto p2 = curve2->GetCurvePoints();
+	int accuracy = 100;
+	auto p1 = curve1->GetCurvePoints(100);
+	auto p2 = curve2->GetCurvePoints(100);
 	to_return[0] = p1[0];
 	to_return[1] = p2[0];
 	// Алгоритм поиска минимального расстояния между кривыми путем перебора всех возможных пар точек
@@ -122,9 +114,9 @@ DllExport vector<Point2D> FindClosestPoints(Curve* curve1, Curve* curve2, double
 		Vector2D v = Vector2D(p1[0].e1, p1[0].e2, p2[0].e1, p2[0].e2);
 		double min = v.GetLength();
 		// Двойной цикл перебора всех пар точек
-		for (int i = 0; i < curve1->accuracy; i++)
+		for (int i = 0; i <accuracy; i++)
 		{
-			for (int j = 0; j < curve2->accuracy; j++)
+			for (int j = 0; j < accuracy; j++)
 			{
 				v = Vector2D(p1[i].e1, p1[i].e2, p2[j].e1, p2[j].e2);
 				auto dist = v.GetLength();
@@ -154,36 +146,36 @@ DllExport vector<Point2D> FindClosestPoints(Curve* curve1, Curve* curve2, double
 			to_return[0] = curClosestPoints[0];
 			to_return[1] = curClosestPoints[1];
 			if (idxP1 == 0) idxP1++;
-			if (idxP1 == curve1->accuracy - 1) idxP1--;
+			if (idxP1 == accuracy - 1) idxP1--;
 			if (idxP2 == 0) idxP2++;
-			if (idxP2 == curve2->accuracy - 1) idxP2--;
+			if (idxP2 == accuracy - 1) idxP2--;
 			// Увеличение точности кривых
-			double tFromNew1 = tFrom1 + ((idxP1 - 1) / (double)(curve1->accuracy - 1)) * (tTo1 - tFrom1);
-			double tToNew1 = tFrom1 + ((idxP1 + 1) / (double)(curve1->accuracy - 1)) * (tTo1 - tFrom1);
-			double tFromNew2 = tFrom2 + ((idxP2 - 1) / (double)(curve2->accuracy - 1)) * (tTo2 - tFrom2);
-			double tToNew2 = tFrom2 + ((idxP2 + 1) / (double)(curve2->accuracy - 1)) * (tTo2 - tFrom2);
+			double tFromNew1 = tFrom1 + ((idxP1 - 1) / (double)(accuracy - 1)) * (tTo1 - tFrom1);
+			double tToNew1 = tFrom1 + ((idxP1 + 1) / (double)(accuracy - 1)) * (tTo1 - tFrom1);
+			double tFromNew2 = tFrom2 + ((idxP2 - 1) / (double)(accuracy - 1)) * (tTo2 - tFrom2);
+			double tToNew2 = tFrom2 + ((idxP2 + 1) / (double)(accuracy - 1)) * (tTo2 - tFrom2);
 			tFrom1 = tFromNew1;
 			tTo1 = tToNew1;
 			tFrom2 = tFromNew2;
 			tTo2 = tToNew2;
-			p1 = curve1->ImproveAccuracy(tFromNew1, tToNew1, curve1->accuracy);
-			p2 = curve2->ImproveAccuracy(tFromNew2, tToNew2, curve2->accuracy);
+			p1 = curve1->ImproveAccuracy(tFromNew1, tToNew1, accuracy);
+			p2 = curve2->ImproveAccuracy(tFromNew2, tToNew2, accuracy);
 		}
 	} while (true);
 	return to_return;
 }
 
 // Функция поиска точки пересечения между массивами точек, представляющих собой 2 различные кривые
-DllExport vector<Point2D> FindCrossPoints(Curve* curve1, Curve* curve2, double eps = 1e-9)
+DllExport vector<Point2D> FindCrossPointsViaSegments(Curve* curve1, Curve* curve2, double eps = 1e-9)
 {
 	std::cout << "\nРезультаты поиска корней через отрезки кривых:\n";
 
 	// Начальная инициализация
 	vector<Point2D> to_return;
-	auto p1 = curve1->GetCurvePoints();
-	auto p2 = curve2->GetCurvePoints();
-	int accuracy1 = curve1->accuracy;
-	int accuracy2 = curve2->accuracy;
+	auto p1 = curve1->GetCurvePoints(100);
+	auto p2 = curve2->GetCurvePoints(100);
+	int accuracy1 = 100;
+	int accuracy2 = 100;
 	std::cout.precision(12);
 
 	// Двойной цикл поиск точек пересечения
@@ -271,11 +263,11 @@ DllExport vector<Point2D> FindCrossPoints(Curve* curve1, Curve* curve2, double e
 				cicleEnd:
 					prevCrossPoint = crossPoint;
 				} while (curEps > eps);
-				p1 = curve1->GetCurvePoints();
-				p2 = curve2->GetCurvePoints();
+				p1 = curve1->GetCurvePoints(100);
+				p2 = curve2->GetCurvePoints(100);
 				to_return.push_back(crossPoint);
-				auto realPoint1 = curve1->MainFunc(tFrom1 + idxP1 * (tTo1 - tFrom1) / accuracy1);
-				auto realPoint2 = curve2->MainFunc(tFrom2 + idxP2 * (tTo2 - tFrom2) / accuracy2);
+				auto realPoint1 = curve1->F(tFrom1 + idxP1 * (tTo1 - tFrom1) / accuracy1);
+				auto realPoint2 = curve2->F(tFrom2 + idxP2 * (tTo2 - tFrom2) / accuracy2);
 				std::cout << std::endl;
 				std::cout << "Точка пересечения #" << to_return.size() << ", точно соответствующая уравнению кривой 1:  " << realPoint1.e1 << " " << realPoint1.e2 << "\n";
 				std::cout << "Точка пересечения #" << to_return.size() << ", точно соответствующая уравнению кривой 2:  " << realPoint2.e1 << " " << realPoint2.e2 << "\n";
@@ -289,7 +281,6 @@ DllExport vector<Point2D> FindCrossPoints(Curve* curve1, Curve* curve2, double e
 
 // Функция поиска точки пересечения между массивами точек, представляющих собой 2 различные кривые
 DllExport vector<Point2D> FindCrossPointsViaEquations(Curve* curve1, Curve* curve2, double eps = 1e-9, int accuracy = 100)
-
 {
 	std::cout << "\nРезультаты поиска корней через уравнения кривых:\n";
 	// Начальная инициализация
@@ -307,11 +298,11 @@ DllExport vector<Point2D> FindCrossPointsViaEquations(Curve* curve1, Curve* curv
 	// Двойной цикл перебора всех возможных корней
 	for (int i = 0; i < accuracy; i++)
 	{
-		p1 = curve1->MainFunc(i * dt1);
+		p1 = curve1->F(i * dt1);
 		for (int j = 0; j < accuracy; j++)
 		{
 			if (i == 0 && j == 0) continue;
-			p2 = curve2->MainFunc(j * dt2);
+			p2 = curve2->F(j * dt2);
 			curEps = Vector2D(p1.e1, p1.e2, p2.e1, p2.e2).GetLength();
 			// Условие существования корня на промежутке (число 1е-1 взято наобум, но работает)
 			// Теоретически из-за этого могут существовать ложные корни, но пока непонятно как решить эту проблему
@@ -351,16 +342,16 @@ DllExport vector<Point2D> FindCrossPointsViaEquations(Curve* curve1, Curve* curv
 
 
 					// Двойной цикл поиска ближайшего к реальному корню значения
-					p1 = curve1->MainFunc(tFrom1);
-					p2 = curve2->MainFunc(tFrom2);
+					p1 = curve1->F(tFrom1);
+					p2 = curve2->F(tFrom2);
 					curEps = Vector2D(p1.e1, p1.e2, p2.e1, p2.e2).GetLength();
 					for (int ii = 0; ii < accuracy; ii++)
 					{
-						p1 = curve1->MainFunc(tFrom1 + ii * dt1);
+						p1 = curve1->F(tFrom1 + ii * dt1);
 						for (int jj = 0; jj < accuracy; jj++)
 						{
 							if (ii == 0 && jj == 0) continue;
-							p2 = curve2->MainFunc(tFrom2 + jj * dt2);
+							p2 = curve2->F(tFrom2 + jj * dt2);
 							newCurEps = Vector2D(p1.e1, p1.e2, p2.e1, p2.e2).GetLength();
 							if (newCurEps < curEps)
 							{
@@ -379,21 +370,21 @@ DllExport vector<Point2D> FindCrossPointsViaEquations(Curve* curve1, Curve* curv
 				to_return.push_back((p1 + p2) / 2);
 
 				// Отладкочная информация
-				realPoint1 = curve1->MainFunc(tFrom1 + dt1 * (idxFrom1 + 1));
-				realPoint2 = curve2->MainFunc(tFrom2 + dt2 * (idxFrom2 + 1));
+				realPoint1 = curve1->F(tFrom1 + dt1 * (idxFrom1 + 1));
+				realPoint2 = curve2->F(tFrom2 + dt2 * (idxFrom2 + 1));
 				std::cout.precision(12);
 				std::cout << "\nТочка пересечения, соответствующая уравнению кривой #1: " << realPoint1.e1 << " " << realPoint1.e2 << "\n";
 				std::cout << "Точка пересечения, соответствующая уравнению кривой #2: " << realPoint2.e1 << " " << realPoint2.e2 << "\n";
 				std::cout.precision(8);
-				std::cout << "Погрешность в решении уравнения f1(t1) - f2(t2) = 0:    " << (realPoint1 - realPoint2).e1 << " " << (realPoint1 - realPoint2).e2 << "\n\n";
+				std::cout << "Погрешность в решении уравнения f1(" << tFrom1 + dt1 * (idxFrom1 + 1) << ") - f2(" << tFrom2 + dt2 * (idxFrom2 + 1) << ") = 0:    " << (realPoint1 - realPoint2).e1 << " " << (realPoint1 - realPoint2).e2 << "\n\n";
 				// Конец отладки
 
 			wrongRootCase:
 				// Возвращаем значения переменных для "грубого" поиска корней по кривой
 				dt1 = 1.0 / accuracy;
 				dt2 = 1.0 / accuracy;
-				p1 = curve1->MainFunc(i * dt1);
-				p2 = curve2->MainFunc(j * dt2);
+				p1 = curve1->F(i * dt1);
+				p2 = curve2->F(j * dt2);
 				tFrom1 = 0;
 				tFrom2 = 0;
 				tTo1 = 1;
@@ -405,5 +396,56 @@ DllExport vector<Point2D> FindCrossPointsViaEquations(Curve* curve1, Curve* curv
 	return to_return;
 }
 
+// Функция поиска точки пересечения между массивами точек, представляющих собой 2 различные кривые
+DllExport vector<Point2D> FindCrossPointsViaGradient(Curve* curve1, Curve* curve2, double eps = 1e-9, int hypothesisCountOfPoints = 2, double dt0 = 0.1, double a0 = 0.005)
+{
+	std::cout << "\nРезультаты поиска корней через градиентный спуск:\n";
+	// Начальная инициализация
+	vector<Point2D> to_return;
+	// Что-то вроде локализации корней - по-прежнему не совсем понятно, как это сделать
+	for (int i = 0; i < hypothesisCountOfPoints; i++)
+	{
+		double startT1 = 1.0 / (hypothesisCountOfPoints + 1) * (i + 1);
+		double startT2 = 1.0 / (hypothesisCountOfPoints + 1) * (i + 1);
+		double prevEps, curEps;
+		double t1 = startT1, t2 = startT2;
+		double dt = dt0;
+		double a = a0;
+		// Функция, которую будем минимизаровать - расстояние между точками кривых
+		auto metric = [](Point2D p1, Point2D p2)->double {return Vector2D(p1.e1, p1.e2, p2.e1, p2.e2).GetLength(); };
+		double l1, l2;
+		curEps = metric(curve1->F(t1), curve2->F(t2));
+		// Градиентый спуск к корню
+		do
+		{
+			l1 = metric(curve1->F(t1), curve2->F(t2));
+			prevEps = curEps;
+			auto grad = gradient(
+				metric(curve1->F(t1), curve2->F(t2)),
+				metric(curve1->F(t1 + dt), curve2->F(t2)),
+				metric(curve1->F(t1), curve2->F(t2 + dt)),
+				dt, dt, a);
+			t1 -= grad[0];
+			t2 -= grad[1];
+			l2 = metric(curve1->F(t1), curve2->F(t2));
+			curEps = abs((l2 + l1) / 2);
+			double mod = curEps / prevEps;
+			dt *= curEps / prevEps;
+			a *= curEps / prevEps;
+		} while (curEps > eps);
+		to_return.push_back((curve1->F(t1) + curve2->F(t2)) / 2);
+		// Отладочная информация
+		auto realPoint1 = curve1->F(t1);
+		auto realPoint2 = curve2->F(t2);
+		std::cout.precision(10);
+		std::cout << "\nТочка пересечения, соответствующая уравнению кривой #1: " << realPoint1.e1 << " " << realPoint1.e2 << "\n";
+		std::cout << "Точка пересечения, соответствующая уравнению кривой #2: " << realPoint2.e1 << " " << realPoint2.e2 << "\n";
+		std::cout << "Погрешность f1(" << t1 << ") - f2(" << t2 << ") = 0:   ";
+		std::cout.precision(6);
+		std::cout << (realPoint1 - realPoint2).e1 << " " << (realPoint1 - realPoint2).e2 << "\n\n";
+	}
+	// Конец поиска корней
+	return to_return;
+}
 
 

@@ -12,8 +12,8 @@ int main()
 	vector<Point2D> basePoints1 = vector<Point2D>{ Point2D(3, 0),  Point2D(1, 3),  Point2D(5, 5),  Point2D(7, 3) };
 	vector<Point2D> basePoints2 = vector<Point2D>{ Point2D(2, 0),  Point2D(6, 3),  Point2D(10, 10) };
 
-	auto curve1 = Bezier(basePoints1, 100);
-	auto curve2 = Bezier(basePoints2, 100);
+	auto curve1 = Bezier(basePoints1);
+	auto curve2 = Bezier(basePoints2);
 
 	Curve* p1 = &curve1;
 	Curve* p2 = &curve2;
@@ -30,7 +30,7 @@ int main()
 		closestPoints[1].e2 << "\n";
 
 
-	crossPoint = FindCrossPoints(p1, p2, 1e-9);
+	crossPoint = FindCrossPointsViaSegments(p1, p2, 1e-9);
 	//for (int i = 0; i < crossPoint.size(); i++)
 	//{
 	//	std::cout << "Точка пересечения кривых #" << i + 1 << ", найденная через функцию без шаблона : " <<
@@ -46,6 +46,9 @@ int main()
 	//		crossPoint[i].e2 << "\n";
 	//}
 
+	crossPoint = FindCrossPointsViaGradient(p1, p2, 1e-9, 2);
+
+	std::cout << "Конец выполнения программы\n";
 	char res;
 	std::cin >> res;
 }
