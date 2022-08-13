@@ -284,6 +284,7 @@ DllExport vector<Point2D> FindCrossPointsViaEquations(Curve* curve1, Curve* curv
 {
 	std::cout << "\nРезультаты поиска корней через уравнения кривых:\n";
 	// Начальная инициализация
+	int count = 0;
 	vector<Point2D> to_return;
 	Point2D p1, p2, realPoint1, realPoint2;
 	double dt1 = 1.0 / accuracy;
@@ -359,6 +360,7 @@ DllExport vector<Point2D> FindCrossPointsViaEquations(Curve* curve1, Curve* curv
 								idxFrom1 = ii;
 								idxFrom2 = jj;
 							}
+							count++;
 						}
 					}
 					idxFrom1 -= 1;
@@ -392,6 +394,7 @@ DllExport vector<Point2D> FindCrossPointsViaEquations(Curve* curve1, Curve* curv
 			}
 		}
 	}
+	std::cout << "Количество итераций: " << count << "\n";
 	// Конец поиска корней
 	return to_return;
 }
@@ -399,6 +402,7 @@ DllExport vector<Point2D> FindCrossPointsViaEquations(Curve* curve1, Curve* curv
 // Функция поиска точки пересечения между массивами точек, представляющих собой 2 различные кривые
 DllExport vector<Point2D> FindCrossPointsViaGradient(Curve* curve1, Curve* curve2, double eps = 1e-9, int hypothesisCountOfPoints = 2, double dt0 = 0.1, double a0 = 0.005)
 {
+	int count = 0;
 	std::cout << "\nРезультаты поиска корней через градиентный спуск:\n";
 	// Начальная инициализация
 	vector<Point2D> to_return;
@@ -432,6 +436,7 @@ DllExport vector<Point2D> FindCrossPointsViaGradient(Curve* curve1, Curve* curve
 			double mod = curEps / prevEps;
 			dt *= curEps / prevEps;
 			a *= curEps / prevEps;
+			count++;
 		} while (curEps > eps);
 		to_return.push_back((curve1->F(t1) + curve2->F(t2)) / 2);
 		// Отладочная информация
@@ -444,6 +449,7 @@ DllExport vector<Point2D> FindCrossPointsViaGradient(Curve* curve1, Curve* curve
 		std::cout.precision(6);
 		std::cout << (realPoint1 - realPoint2).e1 << " " << (realPoint1 - realPoint2).e2 << "\n\n";
 	}
+	std::cout << "Количество итераций: " << count << "\n";
 	// Конец поиска корней
 	return to_return;
 }
