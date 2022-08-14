@@ -38,7 +38,7 @@ public:
 	/// p0.x p0.y
 	/// ...
 	/// pi.x pi.y
-	Bezier(ifstream *stream)
+	Bezier(ifstream* stream, bool closeStream = false)
 	{
 		if (stream->is_open())
 			while (!stream->eof())
@@ -48,6 +48,8 @@ public:
 				*stream >> y;
 				basePoints.push_back(Point2D(x, y));
 			}
+		if (closeStream)
+			stream->close();
 	}
 	// Уравнение кривой в параметрическом виде 
 	Point2D F(double  t) override
@@ -418,49 +420,63 @@ DllExport vector<Point2D> FindCrossPointsViaEquations(Curve* curve1, Curve* curv
 }
 
 // Функция поиска точки пересечения между массивами точек, представляющих собой 2 различные кривые
-DllExport vector<Point2D> FindCrossPointsViaGradient(Curve* curve1, Curve* curve2, double eps = 1e-9, int hypothesisCountOfPoints = 2, double dt0 = 0.01, double a0 = 0.005)
+DllExport vector<Point2D> FindCrossPointsViaGradient(Curve* curve1, Curve* curve2, double eps = 1e-9, int hypothesisCountOfPoints = 2, double startGradientSpeed = 0.05, double dt = 1e-10)
 {
 	int count = 0;
 	std::cout << "\nРезультаты поиска корней через градиентный спуск:\n";
 	// Начальная инициализация
 	vector<Point2D> to_return;
 	Point2D realPoint1, realPoint2;
+	// Функция, которая будет минимизароваться - расстояние между точками кривых
+	auto metric = [](Point2D p1, Point2D p2)->double {return Vector2D(p1.e1, p1.e2, p2.e1, p2.e2).GetLength(); };
 	// Что-то вроде локализации корней - по-прежнему не совсем понятно, как это сделать
 	for (int i = 0; i < hypothesisCountOfPoints; i++)
 	{
 		double t1 = 1.0 / (hypothesisCountOfPoints + 1) * (i + 1);
 		double t2 = 1.0 / (hypothesisCountOfPoints + 1) * (i + 1);
-		double dt = dt0;
-		double a = a0;
+		double a = startGradientSpeed;
 		double prevEps, curEps;
 		double l1, l2;
-		// Функция, которая будет минимизароваться - расстояние между точками кривых
-		auto metric = [](Point2D p1, Point2D p2)->double {return Vector2D(p1.e1, p1.e2, p2.e1, p2.e2).GetLength(); };
 		curEps = metric(curve1->F(t1), curve2->F(t2));
+		Vector2D next_grad, grad;
+
 		// Градиентый спуск к корню
 		do
 		{
 			l1 = metric(curve1->F(t1), curve2->F(t2));
-			prevEps = curEps;
-			auto grad = gradient(
+			grad = gradient(
 				metric(curve1->F(t1), curve2->F(t2)),
 				metric(curve1->F(t1 + dt), curve2->F(t2)),
 				metric(curve1->F(t1), curve2->F(t2 + dt)),
-				dt, dt, a);
+				dt, dt);
 
-			// Движение по антиградиенту
-			t1 -= grad[0];
-			t2 -= grad[1];
+			double dt1, dt2;
+			dt1 = -grad.e1 * a / grad.GetLength();
+			dt2 = -grad.e2 * a / grad.GetLength();
 
-			// Принудительный выход без включения корня в список корней
-			if (t1 < 0 || t2 < 0 || t1>1 || t2>1)
-				goto iteration_end;
+			next_grad = gradient(
+				metric(curve1->F(t1 + dt1), curve2->F(t2 + dt2)),
+				metric(curve1->F(t1 + dt1 + dt), curve2->F(t2 + dt2)),
+				metric(curve1->F(t1 + dt1), curve2->F(t2 + dt2 + dt)),
+				dt, dt);
 
+			// Точка минимума не "перепрыгнута" - делаем шаг побольше
+			if (grad * next_grad > 0)
+			{
+				t1 -= grad.e1 * a * 2 / grad.GetLength();
+				t2 -= grad.e2 * a * 2 / grad.GetLength();
+			}
+			// Точка минимума "перепрыгнута" - делаем шаг поменьше, и в дальнейшем будем более аккуратны
+			else
+			{
+				a /= 1.25;
+				t1 -= grad.e1 * a / grad.GetLength();
+				t2 -= grad.e2 * a / grad.GetLength();
+			}
 			l2 = metric(curve1->F(t1), curve2->F(t2));
+
 			curEps = abs((l2 + l1) / 2);
-			double mod = curEps / prevEps;
-			dt *= curEps / prevEps;
-			a *= curEps / prevEps;
+
 			count++;
 		} while (curEps > eps);
 		to_return.push_back((curve1->F(t1) + curve2->F(t2)) / 2);

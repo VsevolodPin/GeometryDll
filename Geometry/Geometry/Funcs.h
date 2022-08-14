@@ -185,11 +185,8 @@ int fact(int n)
 }
 
 // Метод поиска градиента функции двух переменных
-vector<double> gradient(double f, double fdt1, double fdt2, double dt1, double dt2, double a)
+Vector2D gradient(double f, double fdt1, double fdt2, double dt1, double dt2)
 {
-	vector<double> to_return;
-	to_return.push_back((fdt1 - f) / dt1*a);
-	to_return.push_back((fdt2 - f) / dt2*a);
-	return to_return;
+	return Vector2D((fdt1 - f) / dt1, (fdt2 - f) / dt2);
 }
 

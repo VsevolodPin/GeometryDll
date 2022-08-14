@@ -16,16 +16,27 @@ public:
 		e2 = 0;
 	}
 	// Конструктор через компоненты вектора
-	Vector2D(double e1, double  e2)
+	Vector2D(double e1, double  e2, bool normalize = false)
 	{
 		this->e1 = e1;
 		this->e2 = e2;
+		if (normalize)
+			this->Normalize();
 	}
 	// Конструктор через координаты 2 точек: x-y-x-y
-	Vector2D(double p1e1, double p1e2, double p2e1, double p2e2)
+	Vector2D(double p1e1, double p1e2, double p2e1, double p2e2,bool normalize = false)
 	{
 		this->e1 = p1e1 - p2e1;
 		this->e2 = p1e2 - p2e2;
+		if (normalize)
+			this->Normalize();
+	}
+	// Нормализация вектора
+	void Normalize()
+	{
+		double l = this->GetLength();
+		this->e1 /= l;
+		this->e2 /= l;
 	}
 
 	// Перегрузка основных операторов
