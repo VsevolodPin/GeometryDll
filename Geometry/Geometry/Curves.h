@@ -1,5 +1,7 @@
 #pragma once
 #include <iostream>
+#include <fstream>
+#include <string>
 #include <vector>
 #include "Objects2D.h"
 #include "Funcs.h"
@@ -30,6 +32,22 @@ public:
 	Bezier(vector<Point2D> basePoints)
 	{
 		this->basePoints = basePoints;
+	}
+	/// Конструктор через файловый поток с опорными точками
+	/// Структура файла должна иметь следующий вид:
+	/// p0.x p0.y
+	/// ...
+	/// pi.x pi.y
+	Bezier(ifstream *stream)
+	{
+		if (stream->is_open())
+			while (!stream->eof())
+			{
+				double x, y;
+				*stream >> x;
+				*stream >> y;
+				basePoints.push_back(Point2D(x, y));
+			}
 	}
 	// Уравнение кривой в параметрическом виде 
 	Point2D F(double  t) override
@@ -400,7 +418,7 @@ DllExport vector<Point2D> FindCrossPointsViaEquations(Curve* curve1, Curve* curv
 }
 
 // Функция поиска точки пересечения между массивами точек, представляющих собой 2 различные кривые
-DllExport vector<Point2D> FindCrossPointsViaGradient(Curve* curve1, Curve* curve2, double eps = 1e-9, int hypothesisCountOfPoints = 2, double dt0 = 0.1, double a0 = 0.005)
+DllExport vector<Point2D> FindCrossPointsViaGradient(Curve* curve1, Curve* curve2, double eps = 1e-9, int hypothesisCountOfPoints = 2, double dt0 = 0.01, double a0 = 0.005)
 {
 	int count = 0;
 	std::cout << "\nРезультаты поиска корней через градиентный спуск:\n";
@@ -435,7 +453,7 @@ DllExport vector<Point2D> FindCrossPointsViaGradient(Curve* curve1, Curve* curve
 			t2 -= grad[1];
 
 			// Принудительный выход без включения корня в список корней
-			if (t1 < 0 || t2 < 0 || t1>1 || t2>1) 
+			if (t1 < 0 || t2 < 0 || t1>1 || t2>1)
 				goto iteration_end;
 
 			l2 = metric(curve1->F(t1), curve2->F(t2));

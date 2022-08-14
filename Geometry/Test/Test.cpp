@@ -1,19 +1,37 @@
-﻿// Test.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
-//
-
-#include <iostream>
+﻿#include <iostream>
+#include <fstream>
+#include <string>
 #include "Objects2D.h"
 #include "Curves.h"
+
 
 int main()
 {
 	setlocale(LC_ALL, "Russian");
 
-	vector<Point2D> basePoints1 = vector<Point2D>{ Point2D(3, 0),  Point2D(1, 3),  Point2D(5, 5),  Point2D(7, 3) };
+	vector<Point2D> basePoints1;
 	vector<Point2D> basePoints2 = vector<Point2D>{ Point2D(2, 0),  Point2D(6, 3),  Point2D(10, 10) };
 
+	std::ifstream reader;
+	std::string line;
+	reader.open("curve 1 points.txt");
+	if (reader.is_open())
+	{
+		while (!reader.eof())
+		{
+			double x, y;
+			reader >> x;
+			reader >> y;
+			basePoints1.push_back(Point2D(x, y));
+		}
+	}
+	reader.close();
+
+	reader.open("curve 2 points.txt");
+
 	auto curve1 = Bezier(basePoints1);
-	auto curve2 = Bezier(basePoints2);
+	auto curve2 = Bezier(&reader);
+	reader.close();
 
 	Curve* p1 = &curve1;
 	Curve* p2 = &curve2;
