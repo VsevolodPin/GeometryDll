@@ -13,7 +13,7 @@ class  DllExport Curve
 {
 public:
 	// Уравнение кривой в параметрическом виде (у каждого наследника будет свое уравнение)
-	virtual Point2D F(double  t) = 0;
+	virtual const Point2D F(double  t) = 0;
 	// Получение массива точек (Point2D *) кривой
 	virtual const vector<Point2D> GetCurvePoints(int N) = 0;
 	// Получение двумерного массива координат точек
@@ -51,8 +51,13 @@ public:
 		if (closeStream)
 			stream->close();
 	}
+	// Деструктор
+	~Bezier()
+	{
+		basePoints.clear();
+	}
 	// Уравнение кривой в параметрическом виде 
-	Point2D F(double  t) override
+	const Point2D F(double  t) override
 	{
 		Point2D to_return = Point2D(0, 0);
 		int n = basePoints.size() - 1;
@@ -479,7 +484,9 @@ DllExport vector<Point2D> FindCrossPointsViaGradient(Curve* curve1, Curve* curve
 
 			count++;
 		} while (curEps > eps);
-		to_return.push_back((curve1->F(t1) + curve2->F(t2)) / 2);
+		Point2D p1 = curve1->F(t1);
+		Point2D p2 = curve2->F(t2);
+		to_return.push_back((p1 + p2) / 2);
 		// Отладочная информация
 		realPoint1 = curve1->F(t1);
 		realPoint2 = curve2->F(t2);
