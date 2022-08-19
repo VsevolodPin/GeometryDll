@@ -1,10 +1,8 @@
 ﻿  Test.cpp
-G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(33,18): warning C4251: Bezier::basePoints: class "std::vector<Point2D,std::allocator<Point2D>>" должен иметь dll-интерфейс для использования клиентами class "Bezier"
-G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Funcs.h(6): message : см. объявление "std::vector<Point2D,std::allocator<Point2D>>"
-G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(70,1): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
-G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(92,1): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
-G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(552,15): warning C4102: iteration_end: неиспользованная метка
-G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(489,10): warning C4101: prevEps: неиспользованная локальная переменная
-G:\Visual Studio\Repos\GeometryDll\Geometry\Test\Test.cpp(68,33): warning C4291: void *operator new(size_t,int,const char *,int): не найден соответствующий оператор удаления; если при инициализации возникнет исключение, память не будет освобождена
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.31.31103\include\vcruntime_new_debug.h(26): message : см. объявление "operator new"
+G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(31,18): warning C4251: Bezier::basePoints: class "std::vector<Point2D,std::allocator<Point2D>>" должен иметь dll-интерфейс для использования клиентами class "Bezier"
+G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(18): message : см. объявление "std::vector<Point2D,std::allocator<Point2D>>"
+G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(68,1): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(90,1): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(535,15): warning C4102: iteration_end: неиспользованная метка
+G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(487,10): warning C4101: prevEps: неиспользованная локальная переменная
   Test.vcxproj -> G:\Visual Studio\Repos\GeometryDll\Geometry\x64\Debug\Test.exe

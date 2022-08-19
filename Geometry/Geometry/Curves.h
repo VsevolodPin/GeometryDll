@@ -6,8 +6,6 @@
 #include "Objects2D.h"
 #include "Funcs.h"
 
-using namespace std;
-
 // Класс-родитель для любой кривой
 class  DllExport Curve
 {
@@ -453,7 +451,7 @@ DllExport vector<Point2D> FindCrossPointsViaEquations(Curve* curve1, Curve* curv
 	return to_return;
 }
 
-// Функция нахождения точного градиента в точке
+// Функция нахождения чисто математического градиента 
 Vector2D Gradient(Curve* curve1, Curve* curve2, double t1, double t2)
 {
 	double res1, res2;
@@ -491,30 +489,15 @@ DllExport vector<Point2D> FindCrossPointsViaGradient(Curve* curve1, Curve* curve
 		curEps = metric(curve1->F(t1), curve2->F(t2));
 		Vector2D next_grad, grad;
 
-		//Vector2D gr;
 		// Градиентый спуск к корню
 		do
 		{
 			l1 = metric(curve1->F(t1), curve2->F(t2));
-			//grad = gradient(
-			//	metric(curve1->F(t1), curve2->F(t2)),
-			//	metric(curve1->F(t1 + dt), curve2->F(t2)),
-			//	metric(curve1->F(t1), curve2->F(t2 + dt)),
-			//	dt, dt);
-
 			grad = Gradient(curve1, curve2, t1, t2);
-
-			//gr = Gradient(curve1, curve2, t1, t2);
 
 			double dt1, dt2;
 			dt1 = -grad.e1 * a / grad.GetLength();
 			dt2 = -grad.e2 * a / grad.GetLength();
-
-			//next_grad = gradient(
-			//	metric(curve1->F(t1 + dt1), curve2->F(t2 + dt2)),
-			//	metric(curve1->F(t1 + dt1 + dt), curve2->F(t2 + dt2)),
-			//	metric(curve1->F(t1 + dt1), curve2->F(t2 + dt2 + dt)),
-			//	dt, dt);
 
 			next_grad = Gradient(curve1, curve2, t1+dt1, t2+dt2);
 

@@ -1,12 +1,6 @@
-﻿#define __CRTDBG_MAP_ALLOC
-#include <crtdbg.h>
-#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
-#define new DEBUG_NEW
-
-#include <iostream>
+﻿#include <iostream>
 #include <fstream>
 #include <string>
-#include "Objects2D.h"
 #include "Curves.h"
 
 int main()
@@ -73,6 +67,5 @@ int main()
 	char res;
 	std::cin >> res;
 
-	_CrtDumpMemoryLeaks();
 	return 0;
 }
