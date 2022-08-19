@@ -20,6 +20,8 @@ public:
 	virtual const vector<vector<double>> GetCurveCoords(int N) = 0;
 	// Метод увеличения точности моделирования кривой 
 	virtual const vector<Point2D> ImproveAccuracy(double t1, double t2, int accuracy) = 0;
+	// Виртуальный деструктор
+	virtual ~Curve() = default;
 };
 
 // Класс, представляющий кривую Безье 2го порядка
@@ -40,6 +42,7 @@ public:
 	/// pi.x pi.y
 	Bezier(ifstream* stream, bool closeStream = false)
 	{
+		//int i = 0;
 		if (stream->is_open())
 			while (!stream->eof())
 			{
@@ -52,9 +55,11 @@ public:
 			stream->close();
 	}
 	// Деструктор
-	~Bezier()
+	~Bezier() = default;
+	// Оператор освобождения памяти
+	void operator delete (void* ptr)
 	{
-		basePoints.clear();
+		free(ptr);
 	}
 	// Уравнение кривой в параметрическом виде 
 	const Point2D F(double  t) override

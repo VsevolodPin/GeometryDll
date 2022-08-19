@@ -1,9 +1,13 @@
-﻿#include <iostream>
+﻿#define __CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#define new DEBUG_NEW
+
+#include <iostream>
 #include <fstream>
 #include <string>
 #include "Objects2D.h"
 #include "Curves.h"
-
 
 int main()
 {
@@ -53,7 +57,22 @@ int main()
 
 	crossPoint = FindCrossPointsViaGradient(p1, p2, 1e-9, 2);
 
+	// Проверка на утечку памяти
+	for (int i = 0; i < 1000000; i++)
+	{
+		if (i % 100000 == 0)
+		{
+			int abc = 1;
+		}
+		Curve* curve;
+		curve = new Bezier(basePoints1);
+		delete curve;
+	}
+
 	std::cout << "Конец выполнения программы\n";
 	char res;
 	std::cin >> res;
+
+	_CrtDumpMemoryLeaks();
+	return 0;
 }
