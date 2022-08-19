@@ -14,6 +14,8 @@ class  DllExport Curve
 public:
 	// Уравнение кривой в параметрическом виде (у каждого наследника будет свое уравнение)
 	virtual const Point2D F(double  t) = 0;
+	// Уравнение кривой в параметрическом виде (у каждого наследника будет свое уравнение)
+	virtual const Point2D dF(double  t) = 0;
 	// Получение массива точек (Point2D *) кривой
 	virtual const vector<Point2D> GetCurvePoints(int N) = 0;
 	// Получение двумерного массива координат точек
@@ -83,6 +85,28 @@ public:
 		}
 		return to_return;
 	}
+	// Значение производной в точке t
+	const Point2D dF(double  t) override
+	{
+		Point2D to_return = Point2D(0, 0);
+		int n = basePoints.size() - 1;
+		for (int i = 0; i < basePoints.size(); i++)
+		{
+			if (i != 0 && n - i != 0)
+			{
+				to_return = to_return + basePoints[i] * pow(t, i) * pow(1 - t, n - i) * (double)(fact(n)) / (fact(i) * fact(n - i)) * ((i - n * t) / (t - t * t));
+			}
+			else
+			{
+				if (i == 0)
+					to_return = to_return + basePoints[i] * 1 * pow(1 - t, n - i) * (double)(fact(n)) / (fact(i) * fact(n - i)) * ((i - n * t) / (t - t * t));
+				if (n - i == 0)
+					to_return = to_return + basePoints[i] * pow(t, i) * 1 * (double)(fact(n)) / (fact(i) * fact(n - i)) * ((i - n * t) / (t - t * t));
+			}
+		}
+		return to_return;
+	}
+
 	// Получение массива точек (Point2D *) кривой
 	const vector<Point2D> GetCurvePoints(int N)override
 	{
@@ -429,8 +453,25 @@ DllExport vector<Point2D> FindCrossPointsViaEquations(Curve* curve1, Curve* curv
 	return to_return;
 }
 
+// Функция нахождения точного градиента в точке
+Vector2D Gradient(Curve* curve1, Curve* curve2, double t1, double t2)
+{
+	double res1, res2;
+	Point2D d1, d2;
+	Point2D p1, p2;
+	p1 = curve1->F(t1);
+	p2 = curve2->F(t2);
+	d1 = curve1->dF(t1);
+	d2 = curve2->dF(t2);
+
+	res1 = 2 * (d1.e1 * (p1.e1 - p2.e1) + d1.e2 * (p1.e2 - p2.e2));
+	res2 = 2 * (d2.e1 * (p2.e1 - p1.e1) + d2.e2 * (p2.e2 - p1.e2));
+
+	return Vector2D(res1, res2);
+}
+
 // Функция поиска точки пересечения между массивами точек, представляющих собой 2 различные кривые
-DllExport vector<Point2D> FindCrossPointsViaGradient(Curve* curve1, Curve* curve2, double eps = 1e-9, int hypothesisCountOfPoints = 2, double startGradientSpeed = 0.05, double dt = 1e-10)
+DllExport vector<Point2D> FindCrossPointsViaGradient(Curve* curve1, Curve* curve2, double eps = 1e-9, int hypothesisCountOfPoints = 2, double startGradientSpeed = 0.1, double dt = 1e-10)
 {
 	int count = 0;
 	std::cout << "\nРезультаты поиска корней через градиентный спуск:\n";
@@ -450,31 +491,38 @@ DllExport vector<Point2D> FindCrossPointsViaGradient(Curve* curve1, Curve* curve
 		curEps = metric(curve1->F(t1), curve2->F(t2));
 		Vector2D next_grad, grad;
 
+		//Vector2D gr;
 		// Градиентый спуск к корню
 		do
 		{
 			l1 = metric(curve1->F(t1), curve2->F(t2));
-			grad = gradient(
-				metric(curve1->F(t1), curve2->F(t2)),
-				metric(curve1->F(t1 + dt), curve2->F(t2)),
-				metric(curve1->F(t1), curve2->F(t2 + dt)),
-				dt, dt);
+			//grad = gradient(
+			//	metric(curve1->F(t1), curve2->F(t2)),
+			//	metric(curve1->F(t1 + dt), curve2->F(t2)),
+			//	metric(curve1->F(t1), curve2->F(t2 + dt)),
+			//	dt, dt);
+
+			grad = Gradient(curve1, curve2, t1, t2);
+
+			//gr = Gradient(curve1, curve2, t1, t2);
 
 			double dt1, dt2;
 			dt1 = -grad.e1 * a / grad.GetLength();
 			dt2 = -grad.e2 * a / grad.GetLength();
 
-			next_grad = gradient(
-				metric(curve1->F(t1 + dt1), curve2->F(t2 + dt2)),
-				metric(curve1->F(t1 + dt1 + dt), curve2->F(t2 + dt2)),
-				metric(curve1->F(t1 + dt1), curve2->F(t2 + dt2 + dt)),
-				dt, dt);
+			//next_grad = gradient(
+			//	metric(curve1->F(t1 + dt1), curve2->F(t2 + dt2)),
+			//	metric(curve1->F(t1 + dt1 + dt), curve2->F(t2 + dt2)),
+			//	metric(curve1->F(t1 + dt1), curve2->F(t2 + dt2 + dt)),
+			//	dt, dt);
+
+			next_grad = Gradient(curve1, curve2, t1+dt1, t2+dt2);
 
 			// Точка минимума не "перепрыгнута" - делаем шаг побольше
 			if (grad * next_grad > 0)
 			{
-				t1 -= grad.e1 * a * 2 / grad.GetLength();
-				t2 -= grad.e2 * a * 2 / grad.GetLength();
+				t1 -= grad.e1 * a / grad.GetLength();
+				t2 -= grad.e2 * a / grad.GetLength();
 			}
 			// Точка минимума "перепрыгнута" - делаем шаг поменьше, и в дальнейшем будем более аккуратны
 			else

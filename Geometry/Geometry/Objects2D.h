@@ -96,5 +96,9 @@ public:
 	{
 		return Point2D(e1 / v, e2 / v);
 	}
+	Point2D operator * (Point2D  v)
+	{
+		return Point2D(e1 * v.e1, e2 * v.e2);
+	}
 };
 
