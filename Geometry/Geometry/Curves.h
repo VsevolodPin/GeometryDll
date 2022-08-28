@@ -7,7 +7,7 @@
 #include "Funcs.h"
 
 // Класс-родитель для любой кривой
-class  DllExport Curve
+class DllExport Curve
 {
 public:
 	// Уравнение кривой в параметрическом виде (у каждого наследника будет свое уравнение)
@@ -27,7 +27,7 @@ public:
 };
 
 // Класс, представляющий кривую Безье 2го порядка
-class  DllExport Bezier : public Curve
+class DllExport Bezier : public Curve
 {
 	// Опорные точки
 	vector<Point2D> basePoints;
