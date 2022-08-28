@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "zqz5XWcvnV3iwdNZ2UwQfdPbNedjEPLDd/2QvfpFigauzLquqhber8eqETPnTQCVXhSQmDoVPCUiegKH0/4e1w==",
+  "dgSpecHash": "FPkw1vHcDqC4R6+3fbJJy4ZbXxixtmTpnxdw4e8rKT9wm5XggNRFoSzvOzHGnCztwaWSV87WT/mXhU2+SXy6Tw==",
   "success": true,
-  "projectFilePath": "G:\\Visual Studio\\Repos\\Geom\\Geom\\Geom.csproj",
+  "projectFilePath": "G:\\Visual Studio\\Repos\\GeometryDll\\Geom\\Geom\\Geom.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

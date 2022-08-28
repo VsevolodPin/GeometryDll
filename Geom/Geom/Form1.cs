@@ -84,6 +84,9 @@ namespace Geom
             var curve1 = new Bezier(new Point2D[] { new Point2D(3, 0), new Point2D(1, 3), new Point2D(5, 5), new Point2D(7, 3) }, 100);
             var curve2 = new Bezier(new Point2D[] { new Point2D(2, 0), new Point2D(6, 3), new Point2D(10, 10) }, 100);
 
+            var curve3 = new Bezier(new Point2D[] { new Point2D(0, 4), new Point2D(4, 6), new Point2D(7, 7), new Point2D(4, 10) }, 100);
+            var curve4 = new Bezier(new Point2D[] { new Point2D(0, 0), new Point2D(3, 3), new Point2D(7, 0) }, 100);
+
             var points1 = curve1.GetCurveCoords();
             var points2 = curve2.GetCurveCoords();
 

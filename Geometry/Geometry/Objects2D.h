@@ -100,5 +100,11 @@ public:
 	{
 		return Point2D(e1 * v.e1, e2 * v.e2);
 	}
+	bool operator == (Point2D  v1)
+	{
+		if (this->e1 == v1.e1 && this->e2 == v1.e2)
+			return true;
+		else return false;
+	}
 };
 

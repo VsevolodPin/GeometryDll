@@ -1,12 +1,6 @@
 #pragma once
 #include "Objects2D.h"
 
-// ћетод поиска градиента функции двух переменных
-Vector2D gradient(double f, double fdt1, double fdt2, double dt1, double dt2)
-{
-	return Vector2D((fdt1 - f) / dt1, (fdt2 - f) / dt2);
-}
-
 // ‘ункци€ определени€ факториала числа n
 static int fact(int n)
 {
@@ -19,5 +13,18 @@ static int fact(int n)
 	return to_return;
 }
 
+// ‘ункци€, позвол€юща€ сравнивать точки с определенной точностью
+static bool EqualPoints(Point2D p1, Point2D p2, double eps = 1e-9)
+{
+	int precision = -log10(eps);
+	int mult = 1;
+	for (int i = 0; i < precision; i++)
+		mult *= 10;
+
+	if ((int)(p1.e1 * mult) == (int)(p2.e1 * mult) &&
+		(int)(p1.e2 * mult) == (int)(p2.e2 * mult))
+		return true;
+	else return false;
+}
 
 

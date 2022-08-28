@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "G:\\Visual Studio\\Repos\\Geom\\Geom\\Geom.csproj": {}
+    "G:\\Visual Studio\\Repos\\GeometryDll\\Geom\\Geom\\Geom.csproj": {}
   },
   "projects": {
-    "G:\\Visual Studio\\Repos\\Geom\\Geom\\Geom.csproj": {
+    "G:\\Visual Studio\\Repos\\GeometryDll\\Geom\\Geom\\Geom.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "G:\\Visual Studio\\Repos\\Geom\\Geom\\Geom.csproj",
+        "projectUniqueName": "G:\\Visual Studio\\Repos\\GeometryDll\\Geom\\Geom\\Geom.csproj",
         "projectName": "Geom",
-        "projectPath": "G:\\Visual Studio\\Repos\\Geom\\Geom\\Geom.csproj",
+        "projectPath": "G:\\Visual Studio\\Repos\\GeometryDll\\Geom\\Geom\\Geom.csproj",
         "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "G:\\Visual Studio\\Repos\\Geom\\Geom\\obj\\",
+        "outputPath": "G:\\Visual Studio\\Repos\\GeometryDll\\Geom\\Geom\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
