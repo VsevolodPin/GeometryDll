@@ -24,7 +24,7 @@ public:
 			this->Normalize();
 	}
 	// Конструктор через координаты 2 точек: x-y-x-y
-	Vector2D(double p1e1, double p1e2, double p2e1, double p2e2,bool normalize = false)
+	Vector2D(double p1e1, double p1e2, double p2e1, double p2e2, bool normalize = false)
 	{
 		this->e1 = p1e1 - p2e1;
 		this->e2 = p1e2 - p2e2;
@@ -35,8 +35,15 @@ public:
 	void Normalize()
 	{
 		double l = this->GetLength();
-		this->e1 /= l;
-		this->e2 /= l;
+		if (l != 0)
+		{
+			this->e1 /= l;
+			this->e2 /= l;
+		}
+		else
+		{
+			throw std::invalid_argument("Math error: Attempted to divide by zero");
+		}
 	}
 
 	// Перегрузка основных операторов
@@ -94,6 +101,11 @@ public:
 	}
 	Point2D operator / (double  v)
 	{
+		if (v == 0)
+		{
+			throw std::invalid_argument("Math error: Attempted to divide by zero");
+			return  Point2D(e1, e2);
+		}
 		return Point2D(e1 / v, e2 / v);
 	}
 	Point2D operator * (Point2D  v)

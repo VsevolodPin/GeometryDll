@@ -33,7 +33,7 @@ int main()
 
 	Curve* p1 = &curve1;
 	Curve* p2 = &curve2;
-	crossPoint = FindCrossPoints(p1, p2, 1e-9);
+	crossPoint = FindCrossPoints(p1, p2, 1e-9, true);
 
 	reader.open("curve 3 points.txt");
 	auto curve3 = Bezier(&reader, true);
@@ -42,7 +42,7 @@ int main()
 
 	p1 = &curve3;
 	p2 = &curve4;
-	closestPoints = FindClosestPoints(p1, p2, 1e-9);
+	closestPoints = FindClosestPoints(p1, p2, 1e-9, true);
 
 	std::cout << "Конец выполнения программы\n";
 	char res;
