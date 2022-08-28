@@ -32,7 +32,7 @@ public:
 			this->Normalize();
 	}
 	// Нормализация вектора
-	void Normalize()
+	const void Normalize()
 	{
 		double l = this->GetLength();
 		if (l != 0)
@@ -59,11 +59,11 @@ public:
 	{
 		return Vector2D(e1 * v, e2 * v);
 	}
-	double  operator * (Vector2D v)
+	double operator * (Vector2D v)
 	{
 		return e1 * v.e1 + e2 * v.e2;
 	}
-	double  GetLength()
+	const double GetLength()
 	{
 		return sqrt(e1 * e1 + e2 * e2);
 	}
@@ -112,7 +112,7 @@ public:
 	{
 		return Point2D(e1 * v.e1, e2 * v.e2);
 	}
-	bool operator == (Point2D  v1)
+	const bool operator == (Point2D  v1)
 	{
 		if (this->e1 == v1.e1 && this->e2 == v1.e2)
 			return true;

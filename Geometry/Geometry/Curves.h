@@ -156,7 +156,7 @@ public:
 };
 
 // Функция нахождения чисто математического градиента 
-Vector2D gradient(Curve* curve1, Curve* curve2, double t1, double t2)
+const Vector2D gradient(Curve* curve1, Curve* curve2, double t1, double t2)
 {
 	double gr_e1, gr_e2;
 	Point2D d1, d2;
@@ -174,8 +174,18 @@ Vector2D gradient(Curve* curve1, Curve* curve2, double t1, double t2)
 
 /// Функция поиска наименьшего расстояния между массивами точек, представляющих собой 2 различные кривые.
 /// Возвращаемое значение - массив из двух точек(на 1й и 2й кривой соответственно)
-DllExport vector<Point2D> FindClosestPoints(Curve* curve1, Curve* curve2, double eps = 1e-9, bool debug = false)
+DllExport const vector<Point2D> FindClosestPoints(Curve* curve1, Curve* curve2, double eps = 1e-9, bool debug = false)
 {
+	if (curve1 == NULL)
+	{
+		throw std::invalid_argument("Pointer to the 1st curve is NULL");
+		return vector<Point2D>();
+	}
+	if (curve2 == NULL)
+	{
+		throw std::invalid_argument("Pointer to the 2nd curve is NULL");
+		return vector<Point2D>();
+	}
 	if (debug)
 		std::cout << "\nРезультаты поиска ближайших точек через градиентный спуск:\n";
 	// Начальная инициализация
@@ -252,8 +262,18 @@ DllExport vector<Point2D> FindClosestPoints(Curve* curve1, Curve* curve2, double
 /// curve2 - указатель на вторую кривую
 /// eps - необходимая точность нахождения точек
 /// Возвращаемое значение - массив всех найденных точек пересечения
-DllExport vector<Point2D> FindCrossPoints(Curve* curve1, Curve* curve2, double eps = 1e-9, bool debug = false)
+DllExport const vector<Point2D> FindCrossPoints(Curve* curve1, Curve* curve2, double eps = 1e-9, bool debug = false)
 {
+	if (curve1 == NULL)
+	{
+		throw std::invalid_argument("Pointer to the 1st curve is NULL");
+		return vector<Point2D>();
+	}
+	if (curve2 == NULL)
+	{
+		throw std::invalid_argument("Pointer to the 2nd curve is NULL");
+		return vector<Point2D>();
+	}
 	if (debug)
 	{
 		std::cout << "\nРезультаты поиска корней через градиентный спуск:\n";

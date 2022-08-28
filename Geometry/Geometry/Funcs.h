@@ -2,7 +2,7 @@
 #include "Objects2D.h"
 
 // ‘ункци€ определени€ факториала числа n
-static int fact(int n)
+static const int fact(int n)
 {
 	if (n <= 1) return 1;
 	int to_return = 1;
@@ -14,7 +14,7 @@ static int fact(int n)
 }
 
 // ‘ункци€, позвол€юща€ сравнивать точки с определенной точностью
-static bool EqualPoints(Point2D p1, Point2D p2, double eps = 1e-9)
+static const bool EqualPoints(Point2D p1, Point2D p2, double eps = 1e-9)
 {
 	int precision = -log10(eps);
 	int mult = 1;
