@@ -11,17 +11,17 @@ class DllExport Curve
 {
 public:
 	// ”равнение кривой в параметрическом виде (у каждого наследника будет свое уравнение)
-	virtual const Point2D F(double  t) = 0;
+	virtual Point2D F(double t) const = 0;
 	// ”равнение кривой в параметрическом виде (у каждого наследника будет свое уравнение)
-	virtual const Point2D dF(double  t) = 0;
+	virtual Point2D dF(double t) const = 0;
 	// ѕолучение степени уравнени€ кривой 
-	virtual const int EquationPow() = 0;
+	virtual int EquationPow() const = 0;
 	// ѕолучение массива точек (Point2D *) кривой
-	virtual const vector<Point2D> GetCurvePoints(int N) = 0;
+	virtual vector<Point2D> GetCurvePoints(int N) const = 0;
 	// ѕолучение двумерного массива координат точек
-	virtual const vector<vector<double>> GetCurveCoords(int N) = 0;
+	virtual vector<vector<double>> GetCurveCoords(int N) const = 0;
 	// ћетод увеличени€ точности моделировани€ кривой 
-	virtual const vector<Point2D> ImproveAccuracy(double t1, double t2, int accuracy) = 0;
+	virtual vector<Point2D> ImproveAccuracy(double t1, double t2, int accuracy) const = 0;
 	// ¬иртуальный деструктор
 	virtual ~Curve() = default;
 };
@@ -64,7 +64,7 @@ public:
 		free(ptr);
 	}
 	// ”равнение кривой в параметрическом виде 
-	const Point2D F(double  t) override
+	Point2D F(double t) const override
 	{
 		int n = basePoints.size() - 1;
 		if (t == 0)
@@ -89,7 +89,7 @@ public:
 		return to_return;
 	}
 	// «начение производной в точке t
-	const Point2D dF(double  t) override
+	Point2D dF(double t) const override
 	{
 		int n = basePoints.size() - 1;
 		if (t == 0)
@@ -114,12 +114,12 @@ public:
 		return to_return;
 	}
 	// ѕолучение степени уравнени€ кривой 
-	const int EquationPow() override
+	int EquationPow() const override
 	{
 		return basePoints.size();
 	}
 	// ѕолучение массива точек (Point2D *) кривой
-	const vector<Point2D> GetCurvePoints(int N)override
+	vector<Point2D> GetCurvePoints(int N) const override
 	{
 		vector<Point2D> points;
 		points.resize(N);
@@ -128,7 +128,7 @@ public:
 		return points;
 	}
 	// ѕолучение двумерного массива координат точек
-	const vector<vector<double>> GetCurveCoords(int N)override
+	vector<vector<double>> GetCurveCoords(int N) const override
 	{
 		vector<vector<double>> coords;
 		coords.resize(2);
@@ -143,7 +143,7 @@ public:
 		return coords;
 	}
 	// ћетод увеличени€ точности моделировани€ кривой 
-	const vector<Point2D> ImproveAccuracy(double t1, double t2, int accuracy)override
+	vector<Point2D> ImproveAccuracy(double t1, double t2, int accuracy) const override
 	{
 		vector<Point2D> to_return;
 		to_return.resize(accuracy);
@@ -156,7 +156,7 @@ public:
 };
 
 // ‘ункци€ нахождени€ чисто математического градиента 
-const Vector2D gradient(Curve* curve1, Curve* curve2, double t1, double t2)
+Vector2D gradient(const Curve* curve1, const Curve* curve2, double t1, double t2)
 {
 	double gr_e1, gr_e2;
 	Point2D d1, d2;
@@ -174,7 +174,7 @@ const Vector2D gradient(Curve* curve1, Curve* curve2, double t1, double t2)
 
 /// ‘ункци€ поиска наименьшего рассто€ни€ между массивами точек, представл€ющих собой 2 различные кривые.
 /// ¬озвращаемое значение - массив из двух точек(на 1й и 2й кривой соответственно)
-DllExport const vector<Point2D> FindClosestPoints(Curve* curve1, Curve* curve2, double eps = 1e-9, bool debug = false)
+DllExport vector<Point2D> FindClosestPoints(const Curve* curve1, const Curve* curve2, double eps = 1e-9, bool debug = false)
 {
 	if (curve1 == NULL)
 	{
@@ -262,7 +262,7 @@ DllExport const vector<Point2D> FindClosestPoints(Curve* curve1, Curve* curve2, 
 /// curve2 - указатель на вторую кривую
 /// eps - необходима€ точность нахождени€ точек
 /// ¬озвращаемое значение - массив всех найденных точек пересечени€
-DllExport const vector<Point2D> FindCrossPoints(Curve* curve1, Curve* curve2, double eps = 1e-9, bool debug = false)
+DllExport vector<Point2D> FindCrossPoints(const Curve* curve1, const Curve* curve2, double eps = 1e-9, bool debug = false)
 {
 	if (curve1 == NULL)
 	{

@@ -32,7 +32,7 @@ public:
 			this->Normalize();
 	}
 	// Нормализация вектора
-	const void Normalize()
+	void Normalize()
 	{
 		double l = this->GetLength();
 		if (l != 0)
@@ -47,23 +47,23 @@ public:
 	}
 
 	// Перегрузка основных операторов
-	Vector2D operator + (Vector2D v)
+	Vector2D operator + (Vector2D v) const
 	{
 		return Vector2D(e1 + v.e1, e2 + v.e2);
 	}
-	Vector2D operator -(Vector2D v)
+	Vector2D operator -(Vector2D v) const
 	{
 		return Vector2D(e1 - v.e1, e2 - v.e2);
 	}
-	Vector2D operator * (double  v)
+	Vector2D operator * (double  v) const
 	{
 		return Vector2D(e1 * v, e2 * v);
 	}
-	double operator * (Vector2D v)
+	double operator * (Vector2D v) const
 	{
 		return e1 * v.e1 + e2 * v.e2;
 	}
-	const double GetLength()
+	double GetLength() const
 	{
 		return sqrt(e1 * e1 + e2 * e2);
 	}
@@ -87,19 +87,19 @@ public:
 	}
 
 	// Перегрузка основных операторов
-	Point2D operator + (Point2D v)
+	Point2D operator + (Point2D v) const
 	{
 		return Point2D(e1 + v.e1, e2 + v.e2);
 	}
-	Point2D operator -(Point2D v)
+	Point2D operator -(Point2D v) const
 	{
 		return Point2D(e1 - v.e1, e2 - v.e2);
 	}
-	Point2D operator * (double  v)
+	Point2D  operator  * (double  v) const
 	{
 		return Point2D(e1 * v, e2 * v);
 	}
-	Point2D operator / (double  v)
+	Point2D operator / (double  v) const
 	{
 		if (v == 0)
 		{
@@ -108,11 +108,11 @@ public:
 		}
 		return Point2D(e1 / v, e2 / v);
 	}
-	Point2D operator * (Point2D  v)
+	Point2D operator * (Point2D  v) const
 	{
 		return Point2D(e1 * v.e1, e2 * v.e2);
 	}
-	const bool operator == (Point2D  v1)
+	bool operator == (Point2D  v1) const
 	{
 		if (this->e1 == v1.e1 && this->e2 == v1.e2)
 			return true;

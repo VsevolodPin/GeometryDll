@@ -1,1 +1,10 @@
-﻿  Test.vcxproj -> G:\Visual Studio\Repos\GeometryDll\Geometry\x64\Debug\Test.exe
+﻿  Test.cpp
+G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Funcs.h(19,16): warning C4244: инициализация: преобразование "double" в "int", возможна потеря данных
+G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(33,18): warning C4251: Bezier::basePoints: class "std::vector<Point2D,std::allocator<Point2D>>" должен иметь dll-интерфейс для использования клиентами class "Bezier"
+G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(20): message : см. объявление "std::vector<Point2D,std::allocator<Point2D>>"
+G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(69,1): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(94,1): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(119,1): warning C4267: return: преобразование из "size_t" в "int"; возможна потеря данных
+G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(200,9): warning C4101: prevEps: неиспользованная локальная переменная
+G:\Visual Studio\Repos\GeometryDll\Geometry\Geometry\Curves.h(295,10): warning C4101: prevEps: неиспользованная локальная переменная
+  Test.vcxproj -> G:\Visual Studio\Repos\GeometryDll\Geometry\x64\Debug\Test.exe
